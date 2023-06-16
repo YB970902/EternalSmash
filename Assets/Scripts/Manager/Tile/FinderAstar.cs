@@ -95,8 +95,8 @@ public class FinderAstar : IPathFinder
         /// </summary>
         private int CalcH(int destX, int destY)
         {
-            int x = Mathf.Abs(Index % TileManager.TileXCount - destX);
-            int y = Mathf.Abs(Index / TileManager.TileXCount - destY);
+            int x = Mathf.Abs(Index % TileManager.WidthCount - destX);
+            int y = Mathf.Abs(Index / TileManager.WidthCount - destY);
             return Mathf.Min(x, y) * DiagonalValue + Mathf.Abs(x - y) * DirectValue;
         }
 
@@ -145,8 +145,8 @@ public class FinderAstar : IPathFinder
 
     public void Init()
     {
-        int width = TileManager.TileXCount;
-        int height = TileManager.TileYCount;
+        int width = TileManager.WidthCount;
+        int height = TileManager.HeightCount;
 
         totalCount = width * height;
 
@@ -162,6 +162,12 @@ public class FinderAstar : IPathFinder
                 tileList.Add(tile);
             }
         }
+    }
+
+    public void SetObstacle(int index, bool isObstacle)
+    {
+        if (IsOutOfTile(index)) return;
+        tileList[index].IsObstacle = isObstacle;
     }
 
     public List<int> FindPath(int startIndex, int destIndex)
@@ -182,21 +188,18 @@ public class FinderAstar : IPathFinder
             return result;
         }
 
-        var curTile = tileList[startIndex];
+        tileList.ForEach(tile => tile.Reset());
+        openList.Clear();
 
-        int curX = startIndex % TileManager.TileXCount;
-        int curY = startIndex / TileManager.TileXCount;
+        openList.Enqueue(tileList[startIndex], 0);
 
-        destX = destIndex % TileManager.TileXCount;
-        destY = destIndex / TileManager.TileXCount;
+        destX = destIndex % TileManager.WidthCount;
+        destY = destIndex / TileManager.WidthCount;
 
-        openList.Enqueue(curTile, 0);
+        AstarTile curTile = null;
 
         while (openList.Count > 0)
         {
-            SearchNearNode(curTile);
-            curTile.IsOpen = false;
-            curTile.IsClose = true;
             curTile = openList.Dequeue();
 
             // 경로를 찾았다.
@@ -205,10 +208,16 @@ public class FinderAstar : IPathFinder
                 Debug.Log("Find Path");
                 break;
             }
+
+            curTile.IsClose = true;
+            var nearNode = FindNearTile(curTile);
+            nearNode.ForEach(tile => AddToOpenNode(tile, curTile));
+            curTile.IsOpen = false;
+
         }
 
         // 목적지까지 가는 경로가 없는경우.
-        if (curTile == null)
+        if (curTile.Index != destIndex)
         {
             Debug.Log("None Path");
             return null;
@@ -226,91 +235,125 @@ public class FinderAstar : IPathFinder
     }
 
     /// <summary>
-    /// 주변 노드를 탐색한 후 오픈노드에 넣는다.
+    /// 주변 노드를 반환한다.
     /// </summary>
-    private void SearchNearNode(AstarTile curTile)
+    private List<AstarTile> FindNearTile(AstarTile curTile)
     {
-        int curX = curTile.Index % TileManager.TileXCount;
-        int curY = curTile.Index / TileManager.TileXCount;
+        List<AstarTile> result = new List<AstarTile>(8);
+
+        int curX = curTile.Index % TileManager.WidthCount;
+        int curY = curTile.Index / TileManager.WidthCount;
+
         // 상하좌우 방향을 빠르게 찾기 위한 룩업테이블
         int[] dtX = { -1, 1, 0, 0 };
         int[] dtY = { 0, 0, 1, -1 };
 
         bool[] dirOpen = { false, false, false, false };
 
+        // 상하좌우 검사부터 한다.
         for (Direct i = Direct.Start + 1; i < Direct.End; ++i)
         {
             int index = (int)i;
             int x = curX + dtX[index];
             int y = curY + dtY[index];
 
-            dirOpen[index] = IsInTileAndNotClose(x, y);
-            if (dirOpen[index]) AddToOpenNode(curTile, x, y);
+            dirOpen[index] = IsOpenableTile(x, y);
+            if (dirOpen[index]) result.Add(tileList[x + y * TileManager.WidthCount]);
         }
 
         // 대각선 방향을 빠르게 찾기 위한 룩업테이블
         int[] dgX = { -1, 1, -1, 1 };
         int[] dgY = { 1, 1, -1, -1 };
-        (int, int)[] dgB = { ((int)Direct.Left, (int)Direct.Up), ((int)Direct.Right, (int)Direct.Up), ((int)Direct.Left, (int)Direct.Down), ((int)Direct.Right, (int)Direct.Down) };
+        (int, int)[] dgB = {
+            ((int)Direct.Left, (int)Direct.Up),
+            ((int)Direct.Right, (int)Direct.Up),
+            ((int)Direct.Left, (int)Direct.Down),
+            ((int)Direct.Right, (int)Direct.Down)
+        };
 
+        // 대각선 검사를 한다.
         for (DiagonalDirect i = DiagonalDirect.Start + 1; i < DiagonalDirect.End; ++i)
         {
             int index = (int)i;
-
             int x = curX + dgX[index];
             int y = curY + dgY[index];
 
-            if (dirOpen[dgB[index].Item1] && dirOpen[dgB[index].Item2]) AddToOpenNode(curTile, x, y);
+            if (dirOpen[dgB[index].Item1] &&
+                dirOpen[dgB[index].Item2] &&
+                IsOpenableTile(x, y)) result.Add(tileList[x + y * TileManager.WidthCount]);
         }
+
+        return result;
     }
 
-    private void AddToOpenNode(AstarTile curTile, int x, int y)
+    /// <summary>
+    /// 타일을 오픈 리스트에 넣는다.
+    /// </summary>
+    private void AddToOpenNode(AstarTile tile, AstarTile parentTile)
     {
-        var tile = tileList[x + y * TileManager.TileXCount];
+        // 닫혀있거나 장애물이면 오픈노드가 될 수 없다. 
         if (tile.IsClose || tile.IsObstacle) return;
 
         if (tile.IsOpen)
         {
-            if (tile.IsShortPath(destX, destY, curTile, IsDiagonal(curTile, tile)))
+            // 이미 오픈리스트에 들어있는 경우.
+            if (tile.IsShortPath(destX, destY, parentTile, IsDiagonal(parentTile, tile)))
             {
-                // 현재 경로가 더 짧은 경로라면 갱신한다.
+                // 현재 경로가 더 짧은 경로라면 값을 갱신한다.
                 tile.SetH(destX, destY);
-                tile.SetG(curTile, IsDiagonal(curTile, tile));
-                tile.Parent = curTile;
+                tile.SetG(parentTile, IsDiagonal(parentTile, tile));
+                tile.Parent = parentTile;
                 openList.UpdatePriority(tile, tile.F);
             }
         }
         else
         {
             tile.SetH(destX, destY);
-            tile.SetG(curTile, IsDiagonal(curTile, tile));
+            tile.SetG(parentTile, IsDiagonal(parentTile, tile));
             tile.IsOpen = true;
-            tile.Parent = curTile;
+            tile.Parent = parentTile;
             openList.Enqueue(tile, tile.F);
         }
     }
 
+    /// <summary>
+    /// 인덱스가 타일 범위 밖인지 여부
+    /// </summary>
     private bool IsOutOfTile(int index)
     {
         if (index < 0 || index >= totalCount) return true;
         return false;
     }
 
-    private bool IsInTileAndNotClose(int x, int y)
+    private bool IsOutOfTile(int x, int y)
     {
-        if (x < 0 || x >= TileManager.TileXCount ||
-            y < 0 || y >= TileManager.TileYCount) return false;
-        if (tileList[x + y * TileManager.TileXCount].IsClose) return false;
+        if (x < 0 || x >= TileManager.WidthCount ||
+            y < 0 || y >= TileManager.HeightCount) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// 오픈리스트에 넣을 수 있는 타일인지 여부
+    /// </summary>
+    private bool IsOpenableTile(int x, int y)
+    {
+        if (IsOutOfTile(x, y)) return false;
+
+        var tile = tileList[x + y * TileManager.WidthCount];
+        if (tile.IsClose || tile.IsObstacle) return false;
         return true;
     }
 
+    /// <summary>
+    /// 두 타일이 대각선에 위치한지 여부
+    /// </summary>
     private bool IsDiagonal(AstarTile a, AstarTile b)
     {
-        int aX = a.Index % TileManager.TileXCount;
-        int aY = a.Index / TileManager.TileXCount;
+        int aX = a.Index % TileManager.WidthCount;
+        int aY = a.Index / TileManager.WidthCount;
 
-        int bX = b.Index % TileManager.TileXCount;
-        int bY = b.Index / TileManager.TileXCount;
+        int bX = b.Index % TileManager.WidthCount;
+        int bY = b.Index / TileManager.WidthCount;
 
         return aX != bX && aY != bY;
     }
