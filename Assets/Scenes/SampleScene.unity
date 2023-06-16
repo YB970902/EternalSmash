@@ -164,9 +164,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 357327249}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bde242dad8c5b48009df9cb9bf423430, type: 3}
+  m_Script: {fileID: 11500000, guid: 6663b883c80324adc948cfb81620d319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabTile: {fileID: 4569797695406845467, guid: a60c54f542ad543a3880d02f8eecbcdf, type: 3}
+  obstacleCount: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
