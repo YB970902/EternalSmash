@@ -210,9 +210,10 @@ public class FinderAstar : IPathFinder
             }
 
             curTile.IsClose = true;
-            var nearNode = FindNearTile(curTile);
-            nearNode.ForEach(tile => AddToOpenNode(tile, curTile));
             curTile.IsOpen = false;
+
+            var nearNode = FindNearTile(curTile);
+            nearNode.ForEach(tile => AddToOpenList(tile, curTile));
 
         }
 
@@ -289,7 +290,7 @@ public class FinderAstar : IPathFinder
     /// <summary>
     /// 타일을 오픈 리스트에 넣는다.
     /// </summary>
-    private void AddToOpenNode(AstarTile tile, AstarTile parentTile)
+    private void AddToOpenList(AstarTile tile, AstarTile parentTile)
     {
         // 닫혀있거나 장애물이면 오픈노드가 될 수 없다. 
         if (tile.IsClose || tile.IsObstacle) return;
