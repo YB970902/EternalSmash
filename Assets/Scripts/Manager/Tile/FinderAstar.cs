@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Priority_Queue;
 
+using static Define.Tile;
+
 /// <summary>
 /// 에이스타 알고리즘으로 만들어진 길찾기
 /// </summary>
@@ -109,26 +111,6 @@ public class FinderAstar : IPathFinder
         }
     }
 
-    public enum Direct
-    {
-        Start = -1,
-        Left = 0,
-        Right = 1,
-        Up = 2,
-        Down = 3,
-        End = 4,
-    }
-
-    public enum DiagonalDirect
-    {
-        Start = -1,
-        LeftUp = 0,
-        RightUp = 1,
-        LeftDown = 2,
-        RightDown = 3,
-        End = 4,
-    }
-
     /// <summary> 타일의 총 크기 </summary>
     private int totalCount;
 
@@ -142,6 +124,21 @@ public class FinderAstar : IPathFinder
     private int destX;
     /// <summary> 목적지 위치 Y </summary>
     private int destY;
+    
+    // 상하좌우 방향을 빠르게 찾기 위한 룩업테이블
+    static readonly int[] dtX = { 0, 0, -1, 1 };
+    static readonly int[] dtY = { 1, -1, 0, 0 };
+    bool[] dirOpen = { false, false, false, false };
+    
+    // 대각선 방향을 빠르게 찾기 위한 룩업테이블
+    static readonly int[] dgX = { -1, 1, -1, 1 };
+    static readonly int[] dgY = { 1, 1, -1, -1 };
+    static readonly (int, int)[] dgB = {
+        ((int)Direct.Left, (int)Direct.Up),
+        ((int)Direct.Right, (int)Direct.Up),
+        ((int)Direct.Left, (int)Direct.Down),
+        ((int)Direct.Right, (int)Direct.Down)
+    };
 
     public void Init()
     {
@@ -164,16 +161,16 @@ public class FinderAstar : IPathFinder
         }
     }
 
-    public void SetObstacle(int index, bool isObstacle)
+    public void SetObstacle(int _index, bool _isObstacle)
     {
-        if (IsOutOfTile(index)) return;
-        tileList[index].IsObstacle = isObstacle;
+        if (IsOutOfTile(_index)) return;
+        tileList[_index].IsObstacle = _isObstacle;
     }
 
-    public List<int> FindPath(int startIndex, int destIndex)
+    public List<int> FindPath(int _startIndex, int _destIndex)
     {
         // 타일이 범위를 벗어난 경우
-        if (IsOutOfTile(startIndex) || IsOutOfTile(destIndex))
+        if (IsOutOfTile(_startIndex) || IsOutOfTile(_destIndex))
         {
             Debug.Log("Index is out of Tile");
             return null;
@@ -182,7 +179,7 @@ public class FinderAstar : IPathFinder
         List<int> result = new List<int>(totalCount);
 
         // 이미 목적지에 도착한 경우
-        if (startIndex == destIndex)
+        if (_startIndex == _destIndex)
         {
             Debug.Log("Already at destination");
             return result;
@@ -191,10 +188,10 @@ public class FinderAstar : IPathFinder
         tileList.ForEach(tile => tile.Reset());
         openList.Clear();
 
-        openList.Enqueue(tileList[startIndex], 0);
+        openList.Enqueue(tileList[_startIndex], 0);
 
-        destX = destIndex % TileManager.WidthCount;
-        destY = destIndex / TileManager.WidthCount;
+        destX = _destIndex % TileManager.WidthCount;
+        destY = _destIndex / TileManager.WidthCount;
 
         AstarTile curTile = null;
 
@@ -203,7 +200,7 @@ public class FinderAstar : IPathFinder
             curTile = openList.Dequeue();
 
             // 경로를 찾았다.
-            if (curTile.Index == destIndex)
+            if (curTile.Index == _destIndex)
             {
                 Debug.Log("Find Path");
                 break;
@@ -218,7 +215,7 @@ public class FinderAstar : IPathFinder
         }
 
         // 목적지까지 가는 경로가 없는경우.
-        if (curTile.Index != destIndex)
+        if (curTile.Index != _destIndex)
         {
             Debug.Log("None Path");
             return null;
@@ -245,12 +242,6 @@ public class FinderAstar : IPathFinder
         int curX = curTile.Index % TileManager.WidthCount;
         int curY = curTile.Index / TileManager.WidthCount;
 
-        // 상하좌우 방향을 빠르게 찾기 위한 룩업테이블
-        int[] dtX = { -1, 1, 0, 0 };
-        int[] dtY = { 0, 0, 1, -1 };
-
-        bool[] dirOpen = { false, false, false, false };
-
         // 상하좌우 검사부터 한다.
         for (Direct i = Direct.Start + 1; i < Direct.End; ++i)
         {
@@ -261,16 +252,6 @@ public class FinderAstar : IPathFinder
             dirOpen[index] = IsOpenableTile(x, y);
             if (dirOpen[index]) result.Add(tileList[x + y * TileManager.WidthCount]);
         }
-
-        // 대각선 방향을 빠르게 찾기 위한 룩업테이블
-        int[] dgX = { -1, 1, -1, 1 };
-        int[] dgY = { 1, 1, -1, -1 };
-        (int, int)[] dgB = {
-            ((int)Direct.Left, (int)Direct.Up),
-            ((int)Direct.Right, (int)Direct.Up),
-            ((int)Direct.Left, (int)Direct.Down),
-            ((int)Direct.Right, (int)Direct.Down)
-        };
 
         // 대각선 검사를 한다.
         for (DiagonalDirect i = DiagonalDirect.Start + 1; i < DiagonalDirect.End; ++i)

@@ -12,12 +12,12 @@ public interface IPathFinder
     /// <summary>
     /// 장애물 설정
     /// </summary>
-    public void SetObstacle(int index, bool isObstacle);
+    public void SetObstacle(int _index, bool _isObstacle);
 
     /// <summary>
     /// 경로 반환
     /// </summary>
-    public List<int> FindPath(int startIndex, int destIndex);
+    public List<int> FindPath(int _startIndex, int _destIndex);
 }
 
 public class TileManager : MonoSingleton<TileManager>
@@ -25,13 +25,15 @@ public class TileManager : MonoSingleton<TileManager>
     public static int WidthCount = 10;
     public static int HeightCount = 10;
 
+    public static int TotalCount = WidthCount * HeightCount;
+
     private IPathFinder pathFinder;
 
     public IPathFinder PathFinder => pathFinder;
 
     public override void Init()
     {
-        pathFinder = new FinderAstar();
+        pathFinder = new FinderJPS();
         pathFinder.Init();
     }
 }
