@@ -8,6 +8,8 @@ public class PathFindTest : MonoBehaviour
 
     [SerializeField] int obstacleCount = 0;
 
+    [SerializeField] private List<int> listObstacle = null;
+
     private List<TileTest> tileTestList = new List<TileTest>(TileManager.WidthCount * TileManager.HeightCount);
     
     void Start()
@@ -42,15 +44,27 @@ public class PathFindTest : MonoBehaviour
                 }
             }
 
-            for(int i = 0; i < obstacleCount; ++i)
+            if (listObstacle == null || listObstacle.Count == 0)
             {
-                int randomIndex = Random.Range(0, TileManager.WidthCount * TileManager.HeightCount);
+                for (int i = 0; i < obstacleCount; ++i)
+                {
+                    int randomIndex = Random.Range(0, TileManager.WidthCount * TileManager.HeightCount);
 
-                if (randomIndex == startIndex || randomIndex == destIndex) continue;
+                    if (randomIndex == startIndex || randomIndex == destIndex) continue;
 
-                TileManager.Instance.PathFinder.SetObstacle(randomIndex, true);
-                tileTestList[randomIndex].SetColor(TileTest.TileTestColorTag.Obstacle);
+                    TileManager.Instance.PathFinder.SetObstacle(randomIndex, true);
+                    tileTestList[randomIndex].SetColor(TileTest.TileTestColorTag.Obstacle);
+                }
             }
+            else
+            {
+                for (int i = 0; i < listObstacle.Count; ++i)
+                {
+                    TileManager.Instance.PathFinder.SetObstacle(listObstacle[i], true);
+                    tileTestList[listObstacle[i]].SetColor(TileTest.TileTestColorTag.Obstacle);
+                }
+            }
+
 
             var path = TileManager.Instance.PathFinder.FindPath(startIndex, destIndex);
 
