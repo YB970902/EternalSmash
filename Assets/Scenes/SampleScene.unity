@@ -168,8 +168,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabTile: {fileID: 4569797695406845467, guid: a60c54f542ad543a3880d02f8eecbcdf, type: 3}
-  obstacleCount: 10
+  obstacleCount: 100
   listObstacle: 
+  testCount: 100
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,8 +22,8 @@ public interface IPathFinder
 
 public class TileManager : MonoSingleton<TileManager>
 {
-    public static int WidthCount = 10;
-    public static int HeightCount = 10;
+    public static int WidthCount = 100;
+    public static int HeightCount = 100;
 
     public static int TotalCount = WidthCount * HeightCount;
 
@@ -33,7 +33,7 @@ public class TileManager : MonoSingleton<TileManager>
 
     public override void Init()
     {
-        pathFinder = new FinderAstar();
+        pathFinder = new FinderJPS();
         pathFinder.Init();
     }
 }
