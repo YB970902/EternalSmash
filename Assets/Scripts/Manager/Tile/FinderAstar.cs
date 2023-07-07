@@ -128,7 +128,7 @@ public class FinderAstar : IPathFinder
     // 상하좌우 방향을 빠르게 찾기 위한 룩업테이블
     static readonly int[] dtX = { 0, 0, -1, 1 };
     static readonly int[] dtY = { 1, -1, 0, 0 };
-    bool[] dirOpen = { false, false, false, false };
+    static readonly bool[] dirOpen = { false, false, false, false };
     
     // 대각선 방향을 빠르게 찾기 위한 룩업테이블
     static readonly int[] dgX = { -1, 1, -1, 1 };
@@ -231,14 +231,16 @@ public class FinderAstar : IPathFinder
 
         return result;
     }
-
+    /// <summary> 주변 타일 반환용 리스트. FindNearTile에서만 사용된다. </summary>
+    private List<AstarTile> nearTileResult = new List<AstarTile>(8);
+    
     /// <summary>
     /// 주변 노드를 반환한다.
     /// </summary>
     private List<AstarTile> FindNearTile(AstarTile curTile)
     {
-        List<AstarTile> result = new List<AstarTile>(8);
-
+        nearTileResult.Clear();
+        
         int curX = curTile.Index % TileManager.WidthCount;
         int curY = curTile.Index / TileManager.WidthCount;
 
@@ -250,7 +252,7 @@ public class FinderAstar : IPathFinder
             int y = curY + dtY[index];
 
             dirOpen[index] = IsOpenableTile(x, y);
-            if (dirOpen[index]) result.Add(tileList[x + y * TileManager.WidthCount]);
+            if (dirOpen[index]) nearTileResult.Add(tileList[x + y * TileManager.WidthCount]);
         }
 
         // 대각선 검사를 한다.
@@ -262,10 +264,10 @@ public class FinderAstar : IPathFinder
 
             if (dirOpen[dgB[index].Item1] &&
                 dirOpen[dgB[index].Item2] &&
-                IsOpenableTile(x, y)) result.Add(tileList[x + y * TileManager.WidthCount]);
+                IsOpenableTile(x, y)) nearTileResult.Add(tileList[x + y * TileManager.WidthCount]);
         }
 
-        return result;
+        return nearTileResult;
     }
 
     /// <summary>

@@ -33,7 +33,7 @@ public class TileManager : MonoSingleton<TileManager>
 
     public override void Init()
     {
-        pathFinder = new FinderJPS();
+        pathFinder = new FinderAstar();
         pathFinder.Init();
     }
 }
