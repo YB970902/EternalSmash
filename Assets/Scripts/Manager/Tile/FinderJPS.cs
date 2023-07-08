@@ -171,7 +171,34 @@ public class FinderJPS : IPathFinder
 
         while (curNode != null)
         {
-            result.Add(curNode.Index);
+            var parent = curNode.Parent;
+            bool isDiagonal = curNode.X - parent.X != 0 && curNode.Y - parent.Y != 0;
+            if (isDiagonal)
+            {
+                int x = curNode.X;
+                int y = curNode.Y;
+                var dir = PosToDiagonalDirect(parent.X - curNode.X, parent.Y - curNode.Y);
+                (int dirX, int dirY) = diagonalLookup[(int)dir];
+                while (x != parent.X || y != parent.Y)
+                {
+                    result.Add(PosToIndex(x, y));
+                    x += dirX;
+                    y += dirY;
+                }
+            }
+            else
+            {
+                int x = curNode.X;
+                int y = curNode.Y;
+                var dir = PosToDirect(parent.X - curNode.X, parent.Y - curNode.Y);
+                (int dirX, int dirY) = directLookup[(int)dir];
+                while (x != parent.X || y != parent.Y)
+                {
+                    result.Add(PosToIndex(x, y));
+                    x += dirX;
+                    y += dirY;
+                }
+            }
             curNode = curNode.Parent;
         }
 
@@ -524,6 +551,15 @@ public class FinderJPS : IPathFinder
         if (_y > 0) return Direct.Up;
         
         return Direct.End;
+    }
+
+    private DiagonalDirect PosToDiagonalDirect(int _x, int _y)
+    {
+        if (_x < 0 && _y < 0) return DiagonalDirect.LeftDown;
+        if (_x < 0 && _y > 0) return DiagonalDirect.LeftUp;
+        if (_x > 0 && _y < 0) return DiagonalDirect.RightDown;
+        if (_x > 0 && _y > 0) return DiagonalDirect.RightUp;
+        return DiagonalDirect.End;
     }
 
     private (int, int) IndexToPos(int _index)
