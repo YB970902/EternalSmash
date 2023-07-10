@@ -167,22 +167,21 @@ public class FinderAstar : IPathFinder
         tileList[_index].IsObstacle = _isObstacle;
     }
 
-    public List<int> FindPath(int _startIndex, int _destIndex)
+    public bool FindPath(List<int> _path, int _startIndex, int _destIndex)
     {
+        _path.Clear();
         // 타일이 범위를 벗어난 경우
         if (IsOutOfTile(_startIndex) || IsOutOfTile(_destIndex))
         {
             Debug.Log("Index is out of Tile");
-            return null;
+            return false;
         }
-
-        List<int> result = new List<int>(totalCount);
 
         // 이미 목적지에 도착한 경우
         if (_startIndex == _destIndex)
         {
             Debug.Log("Already at destination");
-            return result;
+            return false;
         }
 
         tileList.ForEach(tile => tile.Reset());
@@ -218,18 +217,18 @@ public class FinderAstar : IPathFinder
         if (curTile.Index != _destIndex)
         {
             Debug.Log("None Path");
-            return null;
+            return false;
         }
 
         while(curTile != null)
         {
-            result.Add(curTile.Index);
+            _path.Add(curTile.Index);
             curTile = curTile.Parent;
         }
 
-        result.Reverse();
+        _path.Reverse();
 
-        return result;
+        return true;
     }
     /// <summary> 주변 타일 반환용 리스트. FindNearTile에서만 사용된다. </summary>
     private List<AstarTile> nearTileResult = new List<AstarTile>(8);

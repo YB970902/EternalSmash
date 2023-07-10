@@ -115,12 +115,14 @@ public class FinderJPS : IPathFinder
         }
     }
 
-    public List<int> FindPath(int _startIndex, int _destIndex)
+    public bool FindPath(List<int> _path, int _startIndex, int _destIndex)
     {
+        _path.Clear();
+        
         if (_startIndex == _destIndex)
         {
             Debug.Log("출발지와 목적지가 같음.");
-            return null;
+            return false;
         }
         
         (destX, destY) = IndexToPos(_destIndex);
@@ -129,13 +131,13 @@ public class FinderJPS : IPathFinder
         if (IsOutOfNode(startX, startY) || IsOutOfNode(destX, destY))
         {
             Debug.Log("출발지 혹은 목적지가 범위 밖임");
-            return null;
+            return false;
         }
 
         if (nodeList[_startIndex].IsObstacle || nodeList[_destIndex].IsObstacle)
         {
             Debug.Log("출발지 혹은 목적지가 장애물임");
-            return null;
+            return false;
         }
 
         openList.Clear();
@@ -164,10 +166,8 @@ public class FinderJPS : IPathFinder
         if (curNode.Index != _destIndex)
         {
             Debug.Log("목적지를 발견하지 못함.");
-            return null;
+            return false;
         }
-
-        var result = new List<int>();
 
         while (curNode != null)
         {
@@ -181,7 +181,7 @@ public class FinderJPS : IPathFinder
                 (int dirX, int dirY) = diagonalLookup[(int)dir];
                 while (x != parent.X || y != parent.Y)
                 {
-                    result.Add(PosToIndex(x, y));
+                    _path.Add(PosToIndex(x, y));
                     x += dirX;
                     y += dirY;
                 }
@@ -194,7 +194,7 @@ public class FinderJPS : IPathFinder
                 (int dirX, int dirY) = directLookup[(int)dir];
                 while (x != parent.X || y != parent.Y)
                 {
-                    result.Add(PosToIndex(x, y));
+                    _path.Add(PosToIndex(x, y));
                     x += dirX;
                     y += dirY;
                 }
@@ -203,9 +203,9 @@ public class FinderJPS : IPathFinder
         }
 
         // 목적지에서부터 출발지로 오는 경로이기 때문에 뒤집는다.
-        result.Reverse();
+        _path.Reverse();
         
-        return result;
+        return true;
     }
 
     /// <summary>  상하좌우 방향으로 나아가는 룩업테이블  </summary>

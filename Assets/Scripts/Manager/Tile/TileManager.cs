@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Battle;
 using FixMath.NET;
 using UnityEngine;
+using System.Linq.Expressions;
 
 public interface IPathFinder
 {
@@ -16,32 +19,107 @@ public interface IPathFinder
     public void SetObstacle(int _index, bool _isObstacle);
 
     /// <summary>
-    /// 경로 반환
+    /// 경로 탐색 성공 여부를 반환하고, 경로는 매개변수를 통해 반환한다.
     /// </summary>
-    public List<int> FindPath(int _startIndex, int _destIndex);
+    public bool FindPath(List<int> _path, int _startIndex, int _destIndex);
 }
 
 public class TileManager : MonoSingleton<TileManager>
 {
+    /// <summary>
+    /// 길찾기 요청에 필요한 값을 가지고 있는 오브젝트이다.
+    /// </summary>
+    private class PathFindRequest
+    {
+        public PathGuide Guide { get; private set; }
+        public List<int> Path { get; private set; }
+        public int StartIndex { get; private set; }
+        public int DestIndex { get; private set; }
+        public System.Action OnPathFindEnd { get; private set; }
+        
+        /// <summary>
+        /// 값을 세팅한다.
+        /// </summary>
+        public void Set(PathGuide _guide, List<int> _path, int _startIndex, int _destIndex, System.Action _onPathFindEnd)
+        {
+            Guide = _guide;
+            Path = _path;
+            StartIndex = _startIndex;
+            DestIndex = _destIndex;
+            OnPathFindEnd = _onPathFindEnd;
+        }
+    }
+    
     public const int WidthCount = 100;
     public const int HeightCount = 100;
     public const int TotalCount = WidthCount * HeightCount;
 
     private static readonly FixVector2 TileSize = new FixVector2(1, 1);
     private static readonly FixVector2 HalfTileSize = new FixVector2(0.5f, 0.5f);
-    
-    private IPathFinder pathFinder;
 
-    public IPathFinder PathFinder => pathFinder;
+    /// <summary> 화면에 위치할 수 있는 캐릭터의 최대 수. </summary>
+    private const int CharacterPoolCount = 100;
+
+    /// <summary>
+    /// PathFuidRequest가 들어있는 오브젝트 풀.
+    /// </summary>
+    private ObjectPool<PathFindRequest> pathFindRequestPool;
+
+    /// <summary> 경로 검색을 요청한 PathGuide </summary>
+    private LinkedList<PathFindRequest> pathFindRequests;
+    /// <summary> 타일위에 놓인 이동 가능한 오브젝트 </summary>
+    private List<Battle.IMovable> movableObjects;
+    
+    /// <summary> 경로 탐색기 </summary>
+    private IPathFinder pathFinder;
 
     public override void Init()
     {
+        pathFindRequestPool = new ObjectPool<PathFindRequest>(CharacterPoolCount);
+
+        pathFindRequests = new LinkedList<PathFindRequest>();
+        movableObjects = new List<IMovable>(CharacterPoolCount);
+        
         pathFinder = new FinderAstar();
         pathFinder.Init();
     }
 
+    public void UpdatePathFind()
+    {
+        if (pathFindRequests.Count == 0) return;
+        
+        var requestObj = pathFindRequests.First.Value;
+        pathFindRequests.RemoveFirst();
+
+        pathFinder.FindPath(requestObj.Path, requestObj.StartIndex, requestObj.DestIndex);
+        requestObj.OnPathFindEnd();
+    }
+
     /// <summary>
-    /// 타일의 위치 반환.
+    /// 길찾기를 요청한다. pathGuide는 pool에 들어가며, 매 프레임마다 조금씩 길찾기를 수행한다. 
+    /// </summary>
+    /// <param name="_pathGuide">길찾기를 수행할 PathGuide</param>
+    /// <param name="_startIndex">출발지 인덱스</param>
+    /// <param name="_destIndex">목적지 인덱스</param>
+    public void RequestPathFind(PathGuide _guide, List<int> _path, int _startIndex, int _destIndex, System.Action _onPathFindEnd)
+    {
+        var requestObj = pathFindRequestPool.Pull();
+        requestObj.Set(_guide, _path, _startIndex, _destIndex, _onPathFindEnd);
+        pathFindRequests.AddLast(requestObj);
+    }
+
+    /// <summary>
+    /// 길찾기를 취소한다.
+    /// </summary>
+    public void CancelPathFind(PathGuide _guide)
+    {
+        var requestObj = pathFindRequests.First(_ => _.Guide == _guide);
+        pathFindRequests.Remove(requestObj);
+        pathFindRequestPool.Push(requestObj);
+    }
+    
+    /// <summary>
+    /// 인덱스에 맞는 타일의 위치 반환.
     /// </summary>
     public FixVector2 GetTilePosition(int _index)
     {
@@ -66,4 +144,19 @@ public class TileManager : MonoSingleton<TileManager>
 
         return (_index % WidthCount, _index / WidthCount);
     }
+    
+    #region Functions for test
+    #if UNITY_EDITOR
+
+    public IPathFinder PathFinder => pathFinder;
+    
+    public List<int> FindPathImmediately(int _startIndex, int _destIndex)
+    {
+        List<int> path = new List<int>(TileManager.TotalCount);
+        pathFinder.FindPath(path, _startIndex, _destIndex);
+        return path;
+    }
+    
+    #endif
+    #endregion
 }

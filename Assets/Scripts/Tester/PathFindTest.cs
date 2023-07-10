@@ -81,7 +81,7 @@ public class PathFindTest : MonoBehaviour
         }
 
 
-        var path = TileManager.Instance.PathFinder.FindPath(startIndex, destIndex);
+        var path = TileManager.Instance.FindPathImmediately(startIndex, destIndex);
 
         path?.ForEach(index => tileTestList[index].SetColor(TileTest.TileTestColorTag.Path));
         tileTestList[startIndex].SetColor(TileTest.TileTestColorTag.Start);
@@ -125,7 +125,7 @@ public class PathFindTest : MonoBehaviour
             
             stopWatch.Start();
             
-            var path = TileManager.Instance.PathFinder.FindPath(startIndex, destIndex);
+            var path = TileManager.Instance.FindPathImmediately(startIndex, destIndex);
             
             stopWatch.Stop();
 

@@ -17,7 +17,6 @@ public class CharacterMoveTest : MonoBehaviour
     private void Start()
     {
         var mgr = BattleManager.Instance;
-        guide.Init();
         guide.Set(movement);
         guide.SetStartIndex(0);
     }

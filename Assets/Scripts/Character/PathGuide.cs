@@ -7,6 +7,7 @@ using UnityEngine;
 /// MovementController에 경로를 주입하는 가이드
 /// 시작위치와 도착위치를 알고 있고 다음으로 이동할 경로를 지속적으로 주입한다.
 /// 다음경로가 막혀있을때나 특정 주기가 되었을 때 새 경로를 탐색한다.
+/// TileManager를 통해 관리된다.
 /// </summary>
 public class PathGuide : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class PathGuide : MonoBehaviour
     private int targetIndex;
 
     /// <summary> 이동해야 하는 경로 </summary>
-    private List<int> path;
+    private List<int> path = new List<int>(TileManager.TotalCount);
     /// <summary>
     /// 현재 경로의 인덱스.
     /// 경로의 앞부분을 자꾸 지우면 연산이 크기 때문에 인덱스를 사용한다.
@@ -26,54 +27,88 @@ public class PathGuide : MonoBehaviour
     /// <summary> 이동할 오브젝트의 이동 관리자 </summary>
     private MovementController controller;
 
-    public void Init()
+    /// <summary>
+    /// 경로를 받기 위해 대기중인지 여부
+    /// </summary>
+    private bool isWaitPath;
+    
+    public bool IsEnable { get; private set; }
+    
+    /// <summary>
+    /// 초기화
+    /// </summary>
+    private void Init()
     {
         startIndex = 0;
         targetIndex = 0;
+        path.Clear();
+        curPathIndex = 0;
+        
+        isWaitPath = false;
+        IsEnable = true;
+        
         if (controller != null)
         {
             controller.onArrive.RemoveListener(OnArriveTarget);
+            controller = null;
         }
-        controller = null;
-        path = null;
-        curPathIndex = 0;
     }
 
+    /// <summary>
+    /// 이동 관리자를 할당
+    /// </summary>
     public void Set(MovementController _controller)
     {
+        Init();
         controller = _controller;
         _controller.onArrive.AddListener(OnArriveTarget);
     }
 
+    /// <summary>
+    /// 이동 관리자 해제
+    /// </summary>
     public void Relase()
     {
         controller.onArrive.RemoveListener(OnArriveTarget);
         controller = null;
-        path = null;
+        path.Clear();
+        IsEnable = false;
+        
+        // 경로를 받기 위해 대기중인 경우 길찾기를 취소한다.
+        if (isWaitPath)
+        {
+            TileManager.Instance.CancelPathFind(this);
+            isWaitPath = false;
+        }
     }
 
+    /// <summary>
+    /// 시작 위치 설정
+    /// 관리중인 오브젝트도 해당 위치로 이동시킨다.
+    /// </summary>
     public void SetStartIndex(int _index)
     {
         startIndex = _index;
         controller.SetPosition(_index);
     }
 
+    /// <summary>
+    /// 이동할 목표 위치를 설정한다.
+    /// </summary>
     public void SetTargetIndex(int _index)
     {
         targetIndex = _index;
-        /*
-         * TODO : 목적지를 주입받았다고 해서 계속 경로를 재탐색한다면 이슈가 생길 수 있다. 일단 목적지를 받아두고 어느정도 주기가 지나거나 특정 조건을 만족했을때 재탐색해야 한다.
-         * 지금은 당장 재탐색을 한다. 추후에 재탐색할 조건과 주기를 선택하자.
-         */
 
-        var newPath = TileManager.Instance.PathFinder.FindPath(startIndex, targetIndex);
+        if (isWaitPath)
+        {
+            TileManager.Instance.CancelPathFind(this);
+        }
+
+        // 길찾기 요청을 보낸다.
+        TileManager.Instance.RequestPathFind(this, path, startIndex, targetIndex, OnFindPath);
         
-        if (newPath == null) return;
-
-        path = newPath;
-
-        curPathIndex = 0;
-        controller.SetNextTile(path[curPathIndex]);
+        // 경로를 기다린다.
+        isWaitPath = true;
     }
 
     /// <summary>
@@ -81,10 +116,27 @@ public class PathGuide : MonoBehaviour
     /// </summary>
     private void OnArriveTarget()
     {
+        startIndex = path[curPathIndex];
         ++curPathIndex;
         // 최종 목적지에 도착
         if (path.Count <= curPathIndex) return;
         
+        controller.SetNextTile(path[curPathIndex]);
+    }
+
+    /// <summary>
+    /// 길찾기를 마친 경우 호출.
+    /// </summary>
+    private void OnFindPath()
+    {
+        // 더이상 경로를 기다리지 않는다.
+        isWaitPath = false;
+        
+        // 경로가 없을경우 반환한다.
+        // TODO : 반환보다는 일정시간 대기후에 다시 길찾기를 시도하는게 좋아보인다.
+        if (path.Count == 0) return;
+
+        curPathIndex = 0;
         controller.SetNextTile(path[curPathIndex]);
     }
 }

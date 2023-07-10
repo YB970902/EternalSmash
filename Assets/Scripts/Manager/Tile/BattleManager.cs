@@ -19,6 +19,13 @@ namespace Battle
 
         private void FixedUpdate()
         {
+            TileManager.Instance.UpdatePathFind();
+
+            UpdateMovementObject();
+        }
+
+        private void UpdateMovementObject()
+        {
             for (int i = 0, count = movementControllers.Count; i < count; ++i)
             {
                 movementControllers[i].Tick();
