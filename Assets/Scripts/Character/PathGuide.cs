@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Battle;
 using Character;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ public class PathGuide : MonoBehaviour
     private int targetIndex;
 
     /// <summary> 이동해야 하는 경로 </summary>
-    private List<int> path = new List<int>(TileManager.TotalCount);
+    private List<int> path = new List<int>(TileModule.TotalCount);
     /// <summary>
     /// 현재 경로의 인덱스.
     /// 경로의 앞부분을 자꾸 지우면 연산이 크기 때문에 인덱스를 사용한다.
@@ -77,7 +78,7 @@ public class PathGuide : MonoBehaviour
         // 경로를 받기 위해 대기중인 경우 길찾기를 취소한다.
         if (isWaitPath)
         {
-            TileManager.Instance.CancelPathFind(this);
+            BattleManager.Instance.Tile.CancelPathFind(this);
             isWaitPath = false;
         }
     }
@@ -101,11 +102,11 @@ public class PathGuide : MonoBehaviour
 
         if (isWaitPath)
         {
-            TileManager.Instance.CancelPathFind(this);
+            BattleManager.Instance.Tile.CancelPathFind(this);
         }
 
         // 길찾기 요청을 보낸다.
-        TileManager.Instance.RequestPathFind(this, path, startIndex, targetIndex, OnFindPath);
+        BattleManager.Instance.Tile.RequestPathFind(this, path, startIndex, targetIndex, OnFindPath);
         
         // 경로를 기다린다.
         isWaitPath = true;

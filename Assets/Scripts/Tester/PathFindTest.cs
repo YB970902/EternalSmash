@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Battle;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -14,17 +15,17 @@ public class PathFindTest : MonoBehaviour
 
     [SerializeField] private int testCount = 10;
 
-    private List<TileTest> tileTestList = new List<TileTest>(TileManager.WidthCount * TileManager.HeightCount);
+    private List<TileTest> tileTestList = new List<TileTest>(TileModule.WidthCount * TileModule.HeightCount);
     
     void Start()
     {
-        for(int y = 0; y < TileManager.HeightCount; ++y)
+        for(int y = 0; y < TileModule.HeightCount; ++y)
         {
-            for(int x = 0; x < TileManager.WidthCount; ++x)
+            for(int x = 0; x < TileModule.WidthCount; ++x)
             {
                 var tile = Instantiate(prefabTile);
                 tile.SetColor(TileTest.TileTestColorTag.Default);
-                tile.SetTilePosition(x + y * TileManager.WidthCount);
+                tile.SetTilePosition(x + y * TileModule.WidthCount);
                 tileTestList.Add(tile);
             }
         }
@@ -46,15 +47,15 @@ public class PathFindTest : MonoBehaviour
     private void PathFindingTest()
     {
         int startIndex = 0;
-        int destIndex = TileManager.WidthCount * TileManager.HeightCount - 1;
+        int destIndex = TileModule.WidthCount * TileModule.HeightCount - 1;
 
-        for (int y = 0; y < TileManager.HeightCount; ++y)
+        for (int y = 0; y < TileModule.HeightCount; ++y)
         {
-            for (int x = 0; x < TileManager.WidthCount; ++x)
+            for (int x = 0; x < TileModule.WidthCount; ++x)
             {
-                var index = x + y * TileManager.WidthCount;
+                var index = x + y * TileModule.WidthCount;
 
-                TileManager.Instance.PathFinder.SetObstacle(index, false);
+                BattleManager.Instance.Tile.PathFinder.SetObstacle(index, false);
                 tileTestList[index].SetColor(TileTest.TileTestColorTag.Default);
             }
         }
@@ -63,11 +64,11 @@ public class PathFindTest : MonoBehaviour
         {
             for (int i = 0; i < obstacleCount; ++i)
             {
-                int randomIndex = Random.Range(0, TileManager.WidthCount * TileManager.HeightCount);
+                int randomIndex = Random.Range(0, TileModule.WidthCount * TileModule.HeightCount);
 
                 if (randomIndex == startIndex || randomIndex == destIndex) continue;
 
-                TileManager.Instance.PathFinder.SetObstacle(randomIndex, true);
+                BattleManager.Instance.Tile.PathFinder.SetObstacle(randomIndex, true);
                 tileTestList[randomIndex].SetColor(TileTest.TileTestColorTag.Obstacle);
             }
         }
@@ -75,13 +76,13 @@ public class PathFindTest : MonoBehaviour
         {
             for (int i = 0; i < listObstacle.Count; ++i)
             {
-                TileManager.Instance.PathFinder.SetObstacle(listObstacle[i], true);
+                BattleManager.Instance.Tile.PathFinder.SetObstacle(listObstacle[i], true);
                 tileTestList[listObstacle[i]].SetColor(TileTest.TileTestColorTag.Obstacle);
             }
         }
 
 
-        var path = TileManager.Instance.FindPathImmediately(startIndex, destIndex);
+        var path = BattleManager.Instance.Tile.FindPathImmediately(startIndex, destIndex);
 
         path?.ForEach(index => tileTestList[index].SetColor(TileTest.TileTestColorTag.Path));
         tileTestList[startIndex].SetColor(TileTest.TileTestColorTag.Start);
@@ -91,15 +92,15 @@ public class PathFindTest : MonoBehaviour
     private void PathFindTimeTest()
     {
         int startIndex = 0;
-        int destIndex = TileManager.WidthCount * TileManager.HeightCount - 1;
+        int destIndex = TileModule.WidthCount * TileModule.HeightCount - 1;
 
-        for (int y = 0; y < TileManager.HeightCount; ++y)
+        for (int y = 0; y < TileModule.HeightCount; ++y)
         {
-            for (int x = 0; x < TileManager.WidthCount; ++x)
+            for (int x = 0; x < TileModule.WidthCount; ++x)
             {
-                var index = x + y * TileManager.WidthCount;
+                var index = x + y * TileModule.WidthCount;
 
-                TileManager.Instance.PathFinder.SetObstacle(index, false);
+                BattleManager.Instance.Tile.PathFinder.SetObstacle(index, false);
                 tileTestList[index].SetColor(TileTest.TileTestColorTag.Default);
             }
         }
@@ -109,23 +110,23 @@ public class PathFindTest : MonoBehaviour
         long totalTime = 0;
         while (curCount < testCount)
         {
-            for (int i = 0; i < TileManager.TotalCount; ++i)
+            for (int i = 0; i < TileModule.TotalCount; ++i)
             {
-                TileManager.Instance.PathFinder.SetObstacle(i, false);
+                BattleManager.Instance.Tile.PathFinder.SetObstacle(i, false);
             }
             
             for (int i = 0; i < obstacleCount; ++i)
             {
-                int randomIndex = Random.Range(0, TileManager.WidthCount * TileManager.HeightCount);
+                int randomIndex = Random.Range(0, TileModule.WidthCount * TileModule.HeightCount);
 
                 if (randomIndex == startIndex || randomIndex == destIndex) continue;
 
-                TileManager.Instance.PathFinder.SetObstacle(randomIndex, true);
+                BattleManager.Instance.Tile.PathFinder.SetObstacle(randomIndex, true);
             }
             
             stopWatch.Start();
             
-            var path = TileManager.Instance.FindPathImmediately(startIndex, destIndex);
+            var path = BattleManager.Instance.Tile.FindPathImmediately(startIndex, destIndex);
             
             stopWatch.Stop();
 

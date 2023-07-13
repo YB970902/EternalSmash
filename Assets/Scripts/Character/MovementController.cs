@@ -60,7 +60,7 @@ namespace Character
         public void SetNextTile(int _index)
         {
             startPosition = position;
-            targetPosition = TileManager.Instance.GetTilePosition(_index);
+            targetPosition = BattleManager.Instance.Tile.GetTilePosition(_index);
             IsMove = true;
         }
 
@@ -69,7 +69,7 @@ namespace Character
         /// </summary>
         public void SetPosition(int _index)
         {
-            SetPosition(TileManager.Instance.GetTilePosition(_index));
+            SetPosition(BattleManager.Instance.Tile.GetTilePosition(_index));
             startPosition = position;
             targetPosition = position;
         }

@@ -24,7 +24,12 @@ public interface IPathFinder
     public bool FindPath(List<int> _path, int _startIndex, int _destIndex);
 }
 
-public class TileManager : MonoSingleton<TileManager>
+/// <summary>
+/// 타일과 관련된 비즈니스 로직이 있는 클래스이다.
+/// 인게임에만 쓰이는 요소이므로, BattleManager에 의존적이다.
+/// 길찾기 탐색 요청 응답 기능과 인덱스를 타일 위치로 바꿔주는 등의 기능을 제공한다.
+/// </summary>
+public class TileModule
 {
     /// <summary>
     /// 길찾기 요청에 필요한 값을 가지고 있는 오브젝트이다.
@@ -73,7 +78,7 @@ public class TileManager : MonoSingleton<TileManager>
     /// <summary> 경로 탐색기 </summary>
     private IPathFinder pathFinder;
 
-    public override void Init()
+    public TileModule()
     {
         pathFindRequestPool = new ObjectPool<PathFindRequest>(CharacterPoolCount);
 
@@ -152,7 +157,7 @@ public class TileManager : MonoSingleton<TileManager>
     
     public List<int> FindPathImmediately(int _startIndex, int _destIndex)
     {
-        List<int> path = new List<int>(TileManager.TotalCount);
+        List<int> path = new List<int>(TileModule.TotalCount);
         pathFinder.FindPath(path, _startIndex, _destIndex);
         return path;
     }

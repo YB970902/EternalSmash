@@ -36,8 +36,8 @@ public class TileTest : MonoBehaviour
 
         Vector2 pos = Vector2.zero;
 
-        pos.x = index % TileManager.WidthCount * tileSize;
-        pos.y = index / TileManager.WidthCount * tileSize;
+        pos.x = index % TileModule.WidthCount * tileSize;
+        pos.y = index / TileModule.WidthCount * tileSize;
 
         transform.position = pos;
     }

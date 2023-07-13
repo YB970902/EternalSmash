@@ -97,8 +97,8 @@ public class FinderAstar : IPathFinder
         /// </summary>
         private int CalcH(int destX, int destY)
         {
-            int x = Mathf.Abs(Index % TileManager.WidthCount - destX);
-            int y = Mathf.Abs(Index / TileManager.WidthCount - destY);
+            int x = Mathf.Abs(Index % TileModule.WidthCount - destX);
+            int y = Mathf.Abs(Index / TileModule.WidthCount - destY);
             return Mathf.Min(x, y) * DiagonalValue + Mathf.Abs(x - y) * DirectValue;
         }
 
@@ -142,8 +142,8 @@ public class FinderAstar : IPathFinder
 
     public void Init()
     {
-        int width = TileManager.WidthCount;
-        int height = TileManager.HeightCount;
+        int width = TileModule.WidthCount;
+        int height = TileModule.HeightCount;
 
         totalCount = width * height;
 
@@ -189,8 +189,8 @@ public class FinderAstar : IPathFinder
 
         openList.Enqueue(tileList[_startIndex], 0);
 
-        destX = _destIndex % TileManager.WidthCount;
-        destY = _destIndex / TileManager.WidthCount;
+        destX = _destIndex % TileModule.WidthCount;
+        destY = _destIndex / TileModule.WidthCount;
 
         AstarTile curTile = null;
 
@@ -240,8 +240,8 @@ public class FinderAstar : IPathFinder
     {
         nearTileResult.Clear();
         
-        int curX = curTile.Index % TileManager.WidthCount;
-        int curY = curTile.Index / TileManager.WidthCount;
+        int curX = curTile.Index % TileModule.WidthCount;
+        int curY = curTile.Index / TileModule.WidthCount;
 
         // 상하좌우 검사부터 한다.
         for (Direct i = Direct.Start + 1; i < Direct.End; ++i)
@@ -251,7 +251,7 @@ public class FinderAstar : IPathFinder
             int y = curY + dtY[index];
 
             dirOpen[index] = IsOpenableTile(x, y);
-            if (dirOpen[index]) nearTileResult.Add(tileList[x + y * TileManager.WidthCount]);
+            if (dirOpen[index]) nearTileResult.Add(tileList[x + y * TileModule.WidthCount]);
         }
 
         // 대각선 검사를 한다.
@@ -263,7 +263,7 @@ public class FinderAstar : IPathFinder
 
             if (dirOpen[dgB[index].Item1] &&
                 dirOpen[dgB[index].Item2] &&
-                IsOpenableTile(x, y)) nearTileResult.Add(tileList[x + y * TileManager.WidthCount]);
+                IsOpenableTile(x, y)) nearTileResult.Add(tileList[x + y * TileModule.WidthCount]);
         }
 
         return nearTileResult;
@@ -310,8 +310,8 @@ public class FinderAstar : IPathFinder
 
     private bool IsOutOfTile(int x, int y)
     {
-        if (x < 0 || x >= TileManager.WidthCount ||
-            y < 0 || y >= TileManager.HeightCount) return true;
+        if (x < 0 || x >= TileModule.WidthCount ||
+            y < 0 || y >= TileModule.HeightCount) return true;
         return false;
     }
 
@@ -322,7 +322,7 @@ public class FinderAstar : IPathFinder
     {
         if (IsOutOfTile(x, y)) return false;
 
-        var tile = tileList[x + y * TileManager.WidthCount];
+        var tile = tileList[x + y * TileModule.WidthCount];
         if (tile.IsClose || tile.IsObstacle) return false;
         return true;
     }
@@ -332,11 +332,11 @@ public class FinderAstar : IPathFinder
     /// </summary>
     private bool IsDiagonal(AstarTile a, AstarTile b)
     {
-        int aX = a.Index % TileManager.WidthCount;
-        int aY = a.Index / TileManager.WidthCount;
+        int aX = a.Index % TileModule.WidthCount;
+        int aY = a.Index / TileModule.WidthCount;
 
-        int bX = b.Index % TileManager.WidthCount;
-        int bY = b.Index / TileManager.WidthCount;
+        int bX = b.Index % TileModule.WidthCount;
+        int bY = b.Index / TileModule.WidthCount;
 
         return aX != bX && aY != bY;
     }

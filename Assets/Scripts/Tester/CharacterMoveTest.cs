@@ -34,15 +34,15 @@ public class CharacterMoveTest : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            var pathFinder = TileManager.Instance.PathFinder;
-            for (int i = 0; i < TileManager.TotalCount; ++i)
+            var pathFinder = BattleManager.Instance.Tile.PathFinder;
+            for (int i = 0; i < TileModule.TotalCount; ++i)
             {
                 pathFinder.SetObstacle(i, false);
             }
 
             for (int i = 0; i < obstacleCount; ++i)
             {
-                pathFinder.SetObstacle(Random.Range(1, TileManager.TotalCount - 1), true);
+                pathFinder.SetObstacle(Random.Range(1, TileModule.TotalCount - 1), true);
             }
         }
     }

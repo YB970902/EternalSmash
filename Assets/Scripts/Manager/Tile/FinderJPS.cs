@@ -33,8 +33,8 @@ public class FinderJPS : IPathFinder
         public Node(int _index)
         {
             Index = _index;
-            x = _index % TileManager.WidthCount;
-            y = _index / TileManager.WidthCount;
+            x = _index % TileModule.WidthCount;
+            y = _index / TileModule.WidthCount;
         }
 
         public void Init()
@@ -102,11 +102,11 @@ public class FinderJPS : IPathFinder
 
     public void Init()
     {
-        openList = new FastPriorityQueue<Node>(TileManager.TotalCount);
-        nodeList = new List<Node>(TileManager.TotalCount);
-        for (int y = 0; y < TileManager.HeightCount; ++y)
+        openList = new FastPriorityQueue<Node>(TileModule.TotalCount);
+        nodeList = new List<Node>(TileModule.TotalCount);
+        for (int y = 0; y < TileModule.HeightCount; ++y)
         {
-            for (int x = 0; x < TileManager.WidthCount; ++x)
+            for (int x = 0; x < TileModule.WidthCount; ++x)
             {
                 var node = new Node(PosToIndex(x, y));
                 node.Init();
@@ -141,7 +141,7 @@ public class FinderJPS : IPathFinder
         }
 
         openList.Clear();
-        for (int i = 0; i < TileManager.TotalCount; ++i)
+        for (int i = 0; i < TileModule.TotalCount; ++i)
         {
             nodeList[i].Init();
         }
@@ -513,7 +513,7 @@ public class FinderJPS : IPathFinder
 
     private bool IsOutOfNode(int _x, int _y)
     {
-        return _x < 0 || _x >= TileManager.WidthCount || _y < 0 || _y >= TileManager.HeightCount;
+        return _x < 0 || _x >= TileModule.WidthCount || _y < 0 || _y >= TileModule.HeightCount;
     }
 
     /// <summary>
@@ -538,7 +538,7 @@ public class FinderJPS : IPathFinder
 
     private int PosToIndex(int _x, int _y)
     {
-        return _x + _y * TileManager.WidthCount;
+        return _x + _y * TileModule.WidthCount;
     }
 
     private Direct PosToDirect(int _x, int _y)
@@ -564,7 +564,7 @@ public class FinderJPS : IPathFinder
 
     private (int, int) IndexToPos(int _index)
     {
-        return (_index % TileManager.WidthCount, _index / TileManager.HeightCount);
+        return (_index % TileModule.WidthCount, _index / TileModule.HeightCount);
     }
     
     /// <summary>
