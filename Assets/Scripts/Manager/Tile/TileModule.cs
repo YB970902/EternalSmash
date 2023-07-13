@@ -53,6 +53,11 @@ public class TileModule
             DestIndex = _destIndex;
             OnPathFindEnd = _onPathFindEnd;
         }
+
+        public void UpdateDestIndex(int _destIndex)
+        {
+            DestIndex = _destIndex;
+        }
     }
     
     public const int WidthCount = 100;
@@ -121,6 +126,15 @@ public class TileModule
         var requestObj = pathFindRequests.First(_ => _.Guide == _guide);
         pathFindRequests.Remove(requestObj);
         pathFindRequestPool.Push(requestObj);
+    }
+
+    /// <summary>
+    /// 목적지 타일의 인덱스를 갱신한다.
+    /// </summary>
+    public void UpdateDestIndex(PathGuide _guide, int _destIndex)
+    {
+        var requestObj = pathFindRequests.First(_ => _.Guide == _guide);
+        requestObj.UpdateDestIndex(_destIndex);
     }
     
     /// <summary>

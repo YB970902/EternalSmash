@@ -102,7 +102,9 @@ public class PathGuide : MonoBehaviour
 
         if (isWaitPath)
         {
-            BattleManager.Instance.Tile.CancelPathFind(this);
+            // 경로를 받기까지 대기하고있는 상황에서 목적지가 바뀌게 되면 목적지를 갱신한다. 
+            BattleManager.Instance.Tile.UpdateDestIndex(this, targetIndex);
+            return;
         }
 
         // 길찾기 요청을 보낸다.
