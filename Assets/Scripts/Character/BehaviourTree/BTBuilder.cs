@@ -47,10 +47,10 @@ public class BTBuilder
     /// </summary>
     public BTBuilder AddRootNode(BTRootData _data)
     {
-        // Root는 트리에서 단 한번만 호출되기 때문에, 여기에서 컨트롤러를 만든다.
-        controller = new BTController();
         
         var node = new BTRoot();
+        // Root는 트리에서 단 한번만 호출되기 때문에, 여기에서 컨트롤러를 만든다.
+        controller = new BTController(node);
         node.Init(null, controller, _data);
 
         AddNodeAndData(node, _data);
@@ -63,6 +63,18 @@ public class BTBuilder
         var parentNode = GetNode(_parentId);
         
         var node = new BTSelector();
+        node.Init(parentNode.OnChildEvaluted, controller, _data);
+
+        AddNodeAndData(node, _data);
+        
+        return this;
+    }
+    
+    public BTBuilder AddSequenceNode(BTSequenceData _data, int _parentId)
+    {
+        var parentNode = GetNode(_parentId);
+        
+        var node = new BTSequence();
         node.Init(parentNode.OnChildEvaluted, controller, _data);
 
         AddNodeAndData(node, _data);

@@ -67,3 +67,22 @@ public class BTSelectorData : BTData
         return result;
     }
 }
+
+public class BTSequenceData : BTData
+{
+    public List<BTNodeBase> Children { get; private set; }
+    public static BTSequenceData Create(BTBuilder _builder, int _id, List<int> _childrenId)
+    {
+        var result = new BTSequenceData();
+        result.ID = _id;
+        result.Children = new List<BTNodeBase>(_childrenId.Count);
+        for (int i = 0, count = _childrenId.Count; i < count; ++i)
+        {
+            result.Children.Add(null);
+            var child = result.Children[i];
+            var nodeId = _childrenId[i];
+            result.AddSequence(_builder, child, nodeId);
+        }
+        return result;
+    }
+}

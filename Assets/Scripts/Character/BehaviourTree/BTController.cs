@@ -10,6 +10,13 @@ public class BTController
     /// <summary> 현재 동작중인 노드 </summary>
     private BTControlNodeBase runningNode;
 
+    private BTRoot rootNode;
+
+    public BTController(BTRoot _rootNode)
+    {
+        rootNode = _rootNode;
+    }
+    
     public void SetRunningNode(BTControlNodeBase _runningNode)
     {
         if (runningNode != _runningNode)
