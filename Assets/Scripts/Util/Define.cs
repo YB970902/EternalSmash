@@ -26,4 +26,14 @@ public static class Define
             End,
         }
     }
+
+    public class BehaviourTree
+    {
+        public enum BTState
+        {
+            Success,
+            Fail,
+            Running,
+        }
+    }
 }
