@@ -40,16 +40,30 @@ public class BTRootData : BTData
 {
     public BTNodeBase Child { get; private set; }
 
-    private void Init(BTBuilder _builder, int _id, int _childId)
-    {
-        ID = _id;
-        AddSequence(_builder, Child, _childId);
-    }
-
     public static BTRootData Create(BTBuilder _builder, int _id, int _childId)
     {
         var result = new BTRootData();
-        result.Init(_builder, _id, _childId);
+        result.ID = _id;
+        result.AddSequence(_builder, result.Child, _childId);
+        return result;
+    }
+}
+
+public class BTSelectorData : BTData
+{
+    public List<BTNodeBase> Children { get; private set; }
+    public static BTSelectorData Create(BTBuilder _builder, int _id, List<int> _childrenId)
+    {
+        var result = new BTSelectorData();
+        result.ID = _id;
+        result.Children = new List<BTNodeBase>(_childrenId.Count);
+        for (int i = 0, count = _childrenId.Count; i < count; ++i)
+        {
+            result.Children.Add(null);
+            var child = result.Children[i];
+            var nodeId = _childrenId[i];
+            result.AddSequence(_builder, child, nodeId);
+        }
         return result;
     }
 }

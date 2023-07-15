@@ -42,18 +42,38 @@ public class BTBuilder
         return controller;
     }
 
+    /// <summary>
+    /// 루트 노드 생성. BTBuilder에서 가장 먼저 호출되어야 하는 함수이다.
+    /// </summary>
     public BTBuilder AddRootNode(BTRootData _data)
     {
         // Root는 트리에서 단 한번만 호출되기 때문에, 여기에서 컨트롤러를 만든다.
         controller = new BTController();
         
-        BTRoot node = new BTRoot();
+        var node = new BTRoot();
         node.Init(null, controller, _data);
-        
-        nodeBases.Add(node);
-        nodeDatas.Add(_data);
+
+        AddNodeAndData(node, _data);
         
         return this;
+    }
+
+    public BTBuilder AddSelectorNode(BTSelectorData _data, int _parentId)
+    {
+        var parentNode = GetNode(_parentId);
+        
+        var node = new BTSelector();
+        node.Init(parentNode.OnChildEvaluted, controller, _data);
+
+        AddNodeAndData(node, _data);
+        
+        return this;
+    }
+
+    private void AddNodeAndData(BTNodeBase _node, BTData _data)
+    {
+        nodeBases.Add(_node);
+        nodeDatas.Add(_data);
     }
     
     public BTNodeBase GetNode(int _id)

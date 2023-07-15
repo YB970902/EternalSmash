@@ -34,4 +34,9 @@ public abstract class BTNodeBase
     /// 평가하는 함수.
     /// </summary>
     public abstract void Evaluate();
+
+    /// <summary>
+    /// 자식의 평가가 끝난경우 결과를 반환받는 함수.
+    /// </summary>
+    public abstract void OnChildEvaluted(BTState _state);
 }

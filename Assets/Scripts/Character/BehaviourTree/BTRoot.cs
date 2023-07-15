@@ -18,6 +18,12 @@ public class BTRoot : BTNodeBase
 
     public override void Evaluate()
     {
-        
+        (Data as BTRootData).Child.Evaluate();
+    }
+
+    public override void OnChildEvaluted(Define.BehaviourTree.BTState _state)
+    {
+        // 다시 자식 노드를 수행시킨다.
+        Evaluate();
     }
 }
