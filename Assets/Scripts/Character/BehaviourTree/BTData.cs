@@ -86,3 +86,19 @@ public class BTSequenceData : BTData
         return result;
     }
 }
+
+public class BTIfData : BTData
+{
+    public BTNodeBase TrueNode { get; private set; }
+    public BTNodeBase FalseNode { get; private set; }
+
+    public static BTIfData Create(BTBuilder _builder, int _id, int _trueNodeId, int _falseNodeId)
+    {
+        var result = new BTIfData();
+        result.ID = _id;
+        result.AddSequence(_builder, result.TrueNode, _trueNodeId);
+        result.AddSequence(_builder, result.FalseNode, _falseNodeId);
+
+        return result;
+    }
+}
