@@ -67,9 +67,13 @@ public class FinderJPS : IPathFinder
 
         public static int CalcH(Node _child, int _destX, int _destY)
         {
-            int x = Mathf.Abs(_child.X - _destX);
-            int y = Mathf.Abs(_child.Y - _destY);
+            return CalcH(_child.X, _child.Y, _destX, _destY);
+        }
 
+        public static int CalcH(int _x1, int _y1, int _x2, int _y2)
+        {
+            int x = Mathf.Abs(_x1 - _x2);
+            int y = Mathf.Abs(_y1 - _y2);
             return (x + y) * 10;
         }
 
@@ -108,7 +112,7 @@ public class FinderJPS : IPathFinder
         {
             for (int x = 0; x < TileModule.WidthCount; ++x)
             {
-                var node = new Node(PosToIndex(x, y));
+                var node = new Node(TileModule.PosToIndex(x, y));
                 node.Init();
                 nodeList.Add(node);
             }
@@ -125,8 +129,8 @@ public class FinderJPS : IPathFinder
             return false;
         }
         
-        (destX, destY) = IndexToPos(_destIndex);
-        (int startX, int startY) = IndexToPos(_startIndex);
+        (destX, destY) = TileModule.IndexToPos(_destIndex);
+        (int startX, int startY) = TileModule.IndexToPos(_startIndex);
 
         if (IsOutOfNode(startX, startY) || IsOutOfNode(destX, destY))
         {
@@ -181,7 +185,7 @@ public class FinderJPS : IPathFinder
                 (int dirX, int dirY) = diagonalLookup[(int)dir];
                 while (x != parent.X || y != parent.Y)
                 {
-                    _path.Add(PosToIndex(x, y));
+                    _path.Add(TileModule.PosToIndex(x, y));
                     x += dirX;
                     y += dirY;
                 }
@@ -194,7 +198,7 @@ public class FinderJPS : IPathFinder
                 (int dirX, int dirY) = directLookup[(int)dir];
                 while (x != parent.X || y != parent.Y)
                 {
-                    _path.Add(PosToIndex(x, y));
+                    _path.Add(TileModule.PosToIndex(x, y));
                     x += dirX;
                     y += dirY;
                 }
@@ -392,25 +396,25 @@ public class FinderJPS : IPathFinder
         while (true)
         {
             // 목적지에 도착했다면, 현재 노드를 반환한다.
-            if (curX == destX && curY == destY) return nodeList[PosToIndex(curX, curY)];
+            if (curX == destX && curY == destY) return nodeList[TileModule.PosToIndex(curX, curY)];
 
             if (isLeftOutOfNode == false)
             {
-                if (nodeList[PosToIndex(curX + leftObsX, curY + leftObsY)].IsObstacle &&
-                    nodeList[PosToIndex(curX + leftOpenX, curY + leftOpenY)].IsObstacle == false)
+                if (nodeList[TileModule.PosToIndex(curX + leftObsX, curY + leftObsY)].IsObstacle &&
+                    nodeList[TileModule.PosToIndex(curX + leftOpenX, curY + leftOpenY)].IsObstacle == false)
                 {
                     // 포인트 조건에 맞다면 반환.
-                    return nodeList[PosToIndex(curX, curY)];
+                    return nodeList[TileModule.PosToIndex(curX, curY)];
                 }
             }
 
             if (isRightOutOfNode == false)
             {
-                if (nodeList[PosToIndex(curX + rightObsX, curY + rightObsY)].IsObstacle &&
-                    nodeList[PosToIndex(curX + rightOpenX, curY + rightOpenY)].IsObstacle == false)
+                if (nodeList[TileModule.PosToIndex(curX + rightObsX, curY + rightObsY)].IsObstacle &&
+                    nodeList[TileModule.PosToIndex(curX + rightOpenX, curY + rightOpenY)].IsObstacle == false)
                 {
                     // 포인트 조건에 맞다면 반환.
-                    return nodeList[PosToIndex(curX, curY)];
+                    return nodeList[TileModule.PosToIndex(curX, curY)];
                 }
             }
             
@@ -456,12 +460,12 @@ public class FinderJPS : IPathFinder
 
         while (true)
         {
-            var curNode = nodeList[PosToIndex(curX, curY)];
+            var curNode = nodeList[TileModule.PosToIndex(curX, curY)];
 
             // 목적지를 발견한 경우, 현재 노드를 반환한다.
             if (curX == destX && curY == destY)
             {
-                return nodeList[PosToIndex(curX, curY)];
+                return nodeList[TileModule.PosToIndex(curX, curY)];
             }
             
             if (IsObstacleNode(curX + leftObsX, curY + leftObsY) &&
@@ -494,7 +498,7 @@ public class FinderJPS : IPathFinder
             if (IsMovableNode(curX + leftOpenX, curY + leftOpenY) == false ||
                 IsMovableNode(curX + rightOpenX, curY + rightOpenY) == false)
             {
-                return nodeList[PosToIndex(curX, curY)];
+                return nodeList[TileModule.PosToIndex(curX, curY)];
             }
 
             // 다음 노드로 이동.
@@ -505,7 +509,7 @@ public class FinderJPS : IPathFinder
     
     public void SetObstacle(int _index, bool _isObstacle)
     {
-        (int x, int y) = IndexToPos(_index);
+        (int x, int y) = TileModule.IndexToPos(_index);
         if (IsOutOfNode(x, y)) return;
 
         nodeList[_index].IsObstacle = _isObstacle;
@@ -523,7 +527,7 @@ public class FinderJPS : IPathFinder
     {
         if (IsOutOfNode(_x, _y)) return false;
 
-        return nodeList[PosToIndex(_x, _y)].IsObstacle == false;
+        return nodeList[TileModule.PosToIndex(_x, _y)].IsObstacle == false;
     }
 
     /// <summary>
@@ -533,12 +537,7 @@ public class FinderJPS : IPathFinder
     {
         if (IsOutOfNode(_x, _y)) return false;
         
-        return nodeList[PosToIndex(_x, _y)].IsObstacle;
-    }
-
-    private int PosToIndex(int _x, int _y)
-    {
-        return _x + _y * TileModule.WidthCount;
+        return nodeList[TileModule.PosToIndex(_x, _y)].IsObstacle;
     }
 
     private Direct PosToDirect(int _x, int _y)
@@ -562,11 +561,6 @@ public class FinderJPS : IPathFinder
         return DiagonalDirect.End;
     }
 
-    private (int, int) IndexToPos(int _index)
-    {
-        return (_index % TileModule.WidthCount, _index / TileModule.HeightCount);
-    }
-    
     /// <summary>
     /// 직선방향 두 개로 대각선 방향 반환.
     /// </summary>
@@ -586,5 +580,76 @@ public class FinderJPS : IPathFinder
             return DiagonalDirect.RightDown;
 
         return DiagonalDirect.End;
+    }
+
+    private static readonly Direct[] LookupStepDirect = new Direct[] {
+        Direct.Right,
+        Direct.Down,
+        Direct.Left,
+        Direct.Up
+    };
+    
+    public int GetNearOpenNode(int _startIndex, int _targetIndex)
+    {
+        // 목표 지점이 장애물이 아니면, 그대로 반환한다.
+        if (nodeList[_targetIndex].IsObstacle == false) return _targetIndex;
+
+        // 목표지점
+        (int targetX, int targetY) = TileModule.IndexToPos(_targetIndex);
+        
+        // 탐색을 시작할 지점
+        int x = targetX;
+        int y = targetY;
+        
+        // 한 방향으로 탐색할 횟수. 2회씩 늘어난다.
+        int stepCount = 2;
+        
+        while (stepCount <= TileModule.WidthCount)
+        {
+            // 탐색 시작 위치가 왼쪽위로 한칸씩 움직인다.
+            x -= 1;
+            y += 1;
+            
+            // 탐색이 가능한 노드를 찾았는지 여부
+            bool isFindOpenNode = false;
+            // 시작위치로부터 H값이 가장 낮은 인덱스를 반환해야 하기 때문에 저장하는 H값과 인덱스.
+            int minH = int.MaxValue;
+            int minIndex = 0;
+            
+            for (int i = 0; i < 4; ++i)
+            {
+                int curDirectIndex = (int)LookupStepDirect[i];
+                (int diffX, int diffY) = directLookup[curDirectIndex];
+                
+                for (int j = 0; j < stepCount; ++j)
+                {
+                    if (IsObstacle(x, y))
+                    {
+                        isFindOpenNode = true;
+                        int h = Node.CalcH(x, y, targetX, targetY);
+                        if (h < minH)
+                        {
+                            minH = h;
+                            minIndex = TileModule.PosToIndex(x, y);
+                        }
+                    }
+
+                    x += diffX;
+                    y += diffY;
+                }
+            }
+
+            if (isFindOpenNode) return minIndex;
+
+            stepCount += 2;
+        }
+
+        return _targetIndex;
+    }
+
+    private bool IsObstacle(int _x, int _y)
+    {
+        if (IsOutOfNode(_x, _y)) return false;
+        return nodeList[TileModule.PosToIndex(_x, _y)].IsObstacle;
     }
 }

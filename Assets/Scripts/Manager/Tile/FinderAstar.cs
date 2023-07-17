@@ -13,30 +13,34 @@ public class FinderAstar : IPathFinder
     /// <summary>
     /// 타일 정보
     /// </summary>
-    public class AstarTile : FastPriorityQueueNode
+    public class Node : FastPriorityQueueNode
     {
         /// <summary> 타일의 인덱스 </summary>
         public int Index { get; private set; }
 
         /// <summary> 목표까지의 대략적인 거리 </summary>
         public int H { get; private set; }
+
         /// <summary> 지금까지 이동한 거리 </summary>
         public int G { get; private set; }
+
         /// <summary> 목표까지의 거리 + 이동한 거리 </summary>
         public int F => H + G;
 
         /// <summary> 오픈 리스트에 있는지 유무 </summary>
         public bool IsOpen { get; set; }
+
         /// <summary> 클로즈 리스트에 있는지 유무 </summary>
         public bool IsClose { get; set; }
 
         /// <summary> 장애물인지 여부 </summary>
         public bool IsObstacle { get; set; }
 
-        public AstarTile Parent { get; set; }
+        public Node Parent { get; set; }
 
         /// <summary> 직선 값 </summary>
         public const int DirectValue = 10;
+
         /// <summary> 대각선 값 </summary>
         public const int DiagonalValue = 14;
 
@@ -76,7 +80,7 @@ public class FinderAstar : IPathFinder
         /// <summary>
         /// G값을 계산한다음 대입한다
         /// </summary>
-        public void SetG(AstarTile prevTile, bool isDiagonal)
+        public void SetG(Node prevTile, bool isDiagonal)
         {
             G = CalcG(prevTile, isDiagonal);
         }
@@ -84,7 +88,7 @@ public class FinderAstar : IPathFinder
         /// <summary>
         /// 현재 경로보다 매개변수로 전달받은 경로가 더 짧은지 여부
         /// </summary>
-        public bool IsShortPath(int destX, int destY, AstarTile prevTile, bool isDiagonal)
+        public bool IsShortPath(int destX, int destY, Node prevTile, bool isDiagonal)
         {
             int H = CalcH(destX, destY);
             int G = CalcG(prevTile, isDiagonal);
@@ -97,15 +101,21 @@ public class FinderAstar : IPathFinder
         /// </summary>
         private int CalcH(int destX, int destY)
         {
-            int x = Mathf.Abs(Index % TileModule.WidthCount - destX);
-            int y = Mathf.Abs(Index / TileModule.WidthCount - destY);
-            return Mathf.Min(x, y) * DiagonalValue + Mathf.Abs(x - y) * DirectValue;
+            return CalcH(Index % TileModule.WidthCount, Index / TileModule.WidthCount, destX, destY);
+        }
+
+        public static int CalcH(int _x1, int _y1, int _x2, int _y2)
+        {
+            int x = Mathf.Abs(_x1 - _x2);
+            int y = Mathf.Abs(_y1 - _y2);
+
+            return (x + y) * 10;
         }
 
         /// <summary>
         /// G값을 계산한 후 반환한다
         /// </summary>
-        private int CalcG(AstarTile prevTile, bool isDiagonal)
+        private int CalcG(Node prevTile, bool isDiagonal)
         {
             return isDiagonal ? prevTile.G + DiagonalValue : prevTile.G + DirectValue;
         }
@@ -115,25 +125,28 @@ public class FinderAstar : IPathFinder
     private int totalCount;
 
     /// <summary> 타일의 리스트 </summary>
-    private List<AstarTile> tileList;
+    private List<Node> tileList;
 
     /// <summary> 오픈 리스트 </summary>
-    private FastPriorityQueue<AstarTile> openList;
+    private FastPriorityQueue<Node> openList;
 
     /// <summary> 목적지 위치 X </summary>
     private int destX;
+
     /// <summary> 목적지 위치 Y </summary>
     private int destY;
-    
+
     // 상하좌우 방향을 빠르게 찾기 위한 룩업테이블
     static readonly int[] dtX = { 0, 0, -1, 1 };
     static readonly int[] dtY = { 1, -1, 0, 0 };
     static readonly bool[] dirOpen = { false, false, false, false };
-    
+
     // 대각선 방향을 빠르게 찾기 위한 룩업테이블
     static readonly int[] dgX = { -1, 1, -1, 1 };
     static readonly int[] dgY = { 1, 1, -1, -1 };
-    static readonly (int, int)[] dgB = {
+
+    static readonly (int, int)[] dgB =
+    {
         ((int)Direct.Left, (int)Direct.Up),
         ((int)Direct.Right, (int)Direct.Up),
         ((int)Direct.Left, (int)Direct.Down),
@@ -147,14 +160,14 @@ public class FinderAstar : IPathFinder
 
         totalCount = width * height;
 
-        tileList = new List<AstarTile>(totalCount);
-        openList = new FastPriorityQueue<AstarTile>(totalCount);
+        tileList = new List<Node>(totalCount);
+        openList = new FastPriorityQueue<Node>(totalCount);
 
-        for(int y = 0; y < height; ++y)
+        for (int y = 0; y < height; ++y)
         {
-            for(int x = 0; x < width; ++x)
+            for (int x = 0; x < width; ++x)
             {
-                var tile = new AstarTile();
+                var tile = new Node();
                 tile.Init(y * width + x);
                 tileList.Add(tile);
             }
@@ -192,7 +205,7 @@ public class FinderAstar : IPathFinder
         destX = _destIndex % TileModule.WidthCount;
         destY = _destIndex / TileModule.WidthCount;
 
-        AstarTile curTile = null;
+        Node curTile = null;
 
         while (openList.Count > 0)
         {
@@ -220,7 +233,7 @@ public class FinderAstar : IPathFinder
             return false;
         }
 
-        while(curTile != null)
+        while (curTile != null)
         {
             _path.Add(curTile.Index);
             curTile = curTile.Parent;
@@ -230,16 +243,17 @@ public class FinderAstar : IPathFinder
 
         return true;
     }
+
     /// <summary> 주변 타일 반환용 리스트. FindNearTile에서만 사용된다. </summary>
-    private List<AstarTile> nearTileResult = new List<AstarTile>(8);
-    
+    private List<Node> nearTileResult = new List<Node>(8);
+
     /// <summary>
     /// 주변 노드를 반환한다.
     /// </summary>
-    private List<AstarTile> FindNearTile(AstarTile curTile)
+    private List<Node> FindNearTile(Node curTile)
     {
         nearTileResult.Clear();
-        
+
         int curX = curTile.Index % TileModule.WidthCount;
         int curY = curTile.Index / TileModule.WidthCount;
 
@@ -272,7 +286,7 @@ public class FinderAstar : IPathFinder
     /// <summary>
     /// 타일을 오픈 리스트에 넣는다.
     /// </summary>
-    private void AddToOpenList(AstarTile tile, AstarTile parentTile)
+    private void AddToOpenList(Node tile, Node parentTile)
     {
         // 닫혀있거나 장애물이면 오픈노드가 될 수 없다. 
         if (tile.IsClose || tile.IsObstacle) return;
@@ -330,7 +344,7 @@ public class FinderAstar : IPathFinder
     /// <summary>
     /// 두 타일이 대각선에 위치한지 여부
     /// </summary>
-    private bool IsDiagonal(AstarTile a, AstarTile b)
+    private bool IsDiagonal(Node a, Node b)
     {
         int aX = a.Index % TileModule.WidthCount;
         int aY = a.Index / TileModule.WidthCount;
@@ -339,5 +353,80 @@ public class FinderAstar : IPathFinder
         int bY = b.Index / TileModule.WidthCount;
 
         return aX != bX && aY != bY;
+    }
+
+    private static readonly Direct[] dtStepDirect = new Direct[] {
+        Direct.Right,
+        Direct.Down,
+        Direct.Left,
+        Direct.Up
+    };
+    
+    public int GetNearOpenNode(int _startIndex, int _targetIndex)
+    {
+        // 목표 지점이 맵 밖에 있다면, 그대로 반환한다.
+        if (IsOutOfTile(_targetIndex)) return _targetIndex;
+
+        // 목표 지점이 장애물이 아니면, 그대로 반환한다.
+        if (tileList[_targetIndex].IsObstacle == false) return _targetIndex;
+
+        // 목표지점
+        (int targetX, int targetY) = TileModule.IndexToPos(_targetIndex);
+        
+        // 탐색을 시작할 지점
+        int x = targetX;
+        int y = targetY;
+        
+        // 한 방향으로 탐색할 횟수. 2회씩 늘어난다.
+        int stepCount = 2;
+        
+        while (stepCount <= TileModule.WidthCount)
+        {
+            // 탐색 시작 위치가 왼쪽위로 한칸씩 움직인다.
+            x -= 1;
+            y += 1;
+            
+            // 탐색이 가능한 노드를 찾았는지 여부
+            bool isFindOpenNode = false;
+            // 시작위치로부터 H값이 가장 낮은 인덱스를 반환해야 하기 때문에 저장하는 H값과 인덱스.
+            int minH = int.MaxValue;
+            int minIndex = 0;
+            
+            for (int i = 0; i < 4; ++i)
+            {
+                int curDirectIndex = (int)dtStepDirect[i];
+                int diffX = dtX[curDirectIndex];
+                int diffY = dtY[curDirectIndex];
+                
+                for (int j = 0; j < stepCount; ++j)
+                {
+                    if (IsObstacle(x, y))
+                    {
+                        isFindOpenNode = true;
+                        int h = Node.CalcH(x, y, targetX, targetY);
+                        if (h < minH)
+                        {
+                            minH = h;
+                            minIndex = TileModule.PosToIndex(x, y);
+                        }
+                    }
+
+                    x += diffX;
+                    y += diffY;
+                }
+            }
+
+            if (isFindOpenNode) return minIndex;
+
+            stepCount += 2;
+        }
+
+        return _targetIndex;
+    }
+
+    private bool IsObstacle(int _x, int _y)
+    {
+        if (IsOutOfTile(_x, _y)) return false;
+        return tileList[TileModule.PosToIndex(_x, _y)].IsObstacle;
     }
 }

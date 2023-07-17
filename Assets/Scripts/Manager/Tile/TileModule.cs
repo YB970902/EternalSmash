@@ -22,6 +22,11 @@ public interface IPathFinder
     /// 경로 탐색 성공 여부를 반환하고, 경로는 매개변수를 통해 반환한다.
     /// </summary>
     public bool FindPath(List<int> _path, int _startIndex, int _destIndex);
+
+    /// <summary>
+    /// 목표 인덱스의 주변에서 시작 인덱스와 가장 가까운 열린 노드를 반환한다.
+    /// </summary>
+    public int GetNearOpenNode(int _startIndex, int _targetIndex);
 }
 
 /// <summary>
@@ -162,6 +167,21 @@ public class TileModule
         }
 
         return (_index % WidthCount, _index / WidthCount);
+    }
+
+    public int GetNearOpenNode(int _startIndex, int _destIndex)
+    {
+        return pathFinder.GetNearOpenNode(_startIndex, _destIndex);
+    }
+    
+    public static (int, int) IndexToPos(int _index)
+    {
+        return (_index % WidthCount, _index / HeightCount);
+    }
+    
+    public static int PosToIndex(int _x, int _y)
+    {
+        return _x + _y * WidthCount;
     }
     
     #region Functions for test
