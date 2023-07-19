@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Define
+namespace Define
 {
     public class Tile
     {
@@ -34,6 +34,13 @@ public static class Define
             Success,
             Fail,
             Running,
+        }
+
+
+        public static class Conditional
+        {
+            public const string True = "True";
+            public const string False = "False";
         }
     }
 }

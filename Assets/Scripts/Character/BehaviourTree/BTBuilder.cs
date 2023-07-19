@@ -92,4 +92,9 @@ public class BTBuilder
     {
         return nodeBases.Find(_ => _.Data.ID == _id);
     }
+    
+    public System.Func<bool> GetFunction(string _funcName)
+    {
+        return controller.GetConditionalFunc(_funcName);
+    }
 }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using static Define.BehaviourTree;
+
 /// <summary>
 /// 행동트리의 메인이 되는 컨트롤러.
 /// </summary>
@@ -15,6 +17,30 @@ public class BTController
     public BTController(BTRoot _rootNode)
     {
         rootNode = _rootNode;
+    }
+
+    /// <summary>
+    /// 함수의 이름을 받으면 그 이름에 맞는 함수를 반환한다.
+    /// </summary>
+    public System.Func<bool> GetConditionalFunc(string _funcName)
+    {
+        switch (_funcName)
+        {
+            case Conditional.True: return True;
+            case Conditional.False: return False;
+        }
+
+        return null;
+    }
+
+    private bool True()
+    {
+        return true;
+    }
+
+    private bool False()
+    {
+        return false;
     }
     
     public void SetRunningNode(BTControlNodeBase _runningNode)

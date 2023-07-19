@@ -34,6 +34,11 @@ public abstract class BTData
     {
         initSequenceFunc += () => { _nodebase = _builder.GetNode(_nodeId); };
     }
+    
+    protected void GetFunction(BTBuilder _builder, System.Func<bool> _func, string _funcName)
+    {
+        initSequenceFunc += () => { _func = _builder.GetFunction(_funcName); };
+    }
 }
 
 public class BTRootData : BTData
@@ -91,14 +96,16 @@ public class BTIfData : BTData
 {
     public BTNodeBase TrueNode { get; private set; }
     public BTNodeBase FalseNode { get; private set; }
+    
+    public System.Func<bool> ConditionalFunc { get; private set; }
 
-    public static BTIfData Create(BTBuilder _builder, int _id, int _trueNodeId, int _falseNodeId)
+    public static BTIfData Create(BTBuilder _builder, int _id, int _trueNodeId, int _falseNodeId, string _funcName)
     {
         var result = new BTIfData();
         result.ID = _id;
         result.AddSequence(_builder, result.TrueNode, _trueNodeId);
         result.AddSequence(_builder, result.FalseNode, _falseNodeId);
-
+        result.GetFunction(_builder, result.ConditionalFunc, _funcName);
         return result;
     }
 }
