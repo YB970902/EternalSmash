@@ -27,6 +27,16 @@ public interface IPathFinder
     /// 목표 인덱스의 주변에서 시작 인덱스와 가장 가까운 열린 노드를 반환한다.
     /// </summary>
     public int GetNearOpenNode(int _startIndex, int _targetIndex);
+
+    /// <summary>
+    /// 점거중인지 설정
+    /// </summary>
+    public void SetOccupied(int _index, bool _isOccupied);
+
+    /// <summary>
+    /// 점거중인지 여부
+    /// </summary>
+    public bool IsOccupied(int _index);
 }
 
 /// <summary>
@@ -183,10 +193,20 @@ public class TileModule
     {
         return _x + _y * WidthCount;
     }
+
+    public void SetOccupied(int _index, bool _isOccupied)
+    {
+        pathFinder.SetOccupied(_index, _isOccupied);
+    }
+    
+    public bool IsOccupied(int _index)
+    {
+        return pathFinder.IsOccupied(_index);
+    }
     
     #region Functions for test
     #if UNITY_EDITOR
-
+    
     public IPathFinder PathFinder => pathFinder;
     
     public List<int> FindPathImmediately(int _startIndex, int _destIndex)

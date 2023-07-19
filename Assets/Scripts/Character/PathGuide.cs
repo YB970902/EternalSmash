@@ -40,10 +40,10 @@ public class PathGuide : MonoBehaviour
     /// </summary>
     private void Init()
     {
-        startIndex = 0;
-        targetIndex = 0;
+        startIndex = Define.Tile.InvalidTileIndex;
+        targetIndex = Define.Tile.InvalidTileIndex;
         path.Clear();
-        curPathIndex = 0;
+        curPathIndex = Define.Tile.InvalidTileIndex;
         
         isWaitPath = false;
         IsEnable = true;
@@ -89,8 +89,15 @@ public class PathGuide : MonoBehaviour
     /// </summary>
     public void SetStartIndex(int _index)
     {
+        if (Define.Tile.InvalidTileIndex != startIndex)
+        {
+            // 이미 어딘가에 위치해 있는 상황에서 순간이동이라면, 점거를 해제해야 한다.
+            SetOccupied(startIndex, false);
+            SetOccupied(GetNextPath(), false);
+        }
         startIndex = _index;
         controller.SetPosition(_index);
+        SetOccupied(startIndex, true);
     }
 
     /// <summary>
@@ -124,7 +131,7 @@ public class PathGuide : MonoBehaviour
         // 최종 목적지에 도착
         if (path.Count <= curPathIndex) return;
         
-        controller.SetNextTile(path[curPathIndex]);
+        controller.SetNextTile(GetNextPath());
     }
 
     /// <summary>
@@ -141,5 +148,25 @@ public class PathGuide : MonoBehaviour
 
         curPathIndex = 0;
         controller.SetNextTile(path[curPathIndex]);
+    }
+
+    private int GetNextPath()
+    {
+        if (path.Count <= curPathIndex) return Define.Tile.InvalidTileIndex;
+        return path[curPathIndex];
+    }
+
+    private void SetOccupied(int _index, bool _isOccupied)
+    {
+        if (_index == Define.Tile.InvalidTileIndex) return;
+        
+        BattleManager.Instance.Tile.SetOccupied(_index, _isOccupied);
+    }
+    
+    private bool IsOccupied(int _index)
+    {
+        if (_index == Define.Tile.InvalidTileIndex) return true;
+        
+        return BattleManager.Instance.Tile.IsOccupied(_index);
     }
 }

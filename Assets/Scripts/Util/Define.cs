@@ -6,6 +6,8 @@ namespace Define
 {
     public class Tile
     {
+        public const int InvalidTileIndex = -1;
+        
         public enum Direct
         {
             Start = -1,

@@ -27,6 +27,9 @@ public class FinderJPS : IPathFinder
         public bool IsOpen { get; set; }
         public bool IsClose { get; set; }
         public bool IsObstacle { get; set; }
+        
+        /// <summary> 다른 캐릭터가 점거중인지 여부 </summary>
+        public bool IsOccupied { get; set; }
 
         public Node Parent { get; private set; }
 
@@ -652,6 +655,16 @@ public class FinderJPS : IPathFinder
         }
 
         return _targetIndex;
+    }
+
+    public void SetOccupied(int _index, bool _isOccupied)
+    {
+        nodeList[_index].IsOccupied = _isOccupied;
+    }
+
+    public bool IsOccupied(int _index)
+    {
+        return nodeList[_index].IsOccupied;
     }
 
     private bool IsObstacle(int _x, int _y)
