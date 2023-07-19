@@ -154,6 +154,8 @@ public class FinderJPS : IPathFinder
         curNode.IsOpen = true;
         curNode.SetValue(null, destX, destY);
         openList.Enqueue(curNode, curNode.F);
+
+        Node approNode = curNode;
         
         while (openList.Count > 0)
         {
@@ -161,6 +163,11 @@ public class FinderJPS : IPathFinder
             curNode.IsOpen = false;
             curNode.IsClose = true;
 
+            if (curNode.F <= approNode.F)
+            {
+                approNode = curNode;
+            }
+            
             // 목적지를 찾았다면 반환.
             if (curNode.Index == _destIndex) break;
             
@@ -169,11 +176,11 @@ public class FinderJPS : IPathFinder
 
         if (curNode.Index != _destIndex)
         {
-            Debug.Log("목적지를 발견하지 못함.");
-            return false;
+            // 최종 타일이 목표 타일이 아닌경우, 목표와 가장 근사한 위치의 타일을 목표로 잡고 탐색한다.
+            curNode = approNode;
         }
 
-        while (curNode != null)
+        while (curNode != null && curNode.Parent != null)
         {
             var parent = curNode.Parent;
             bool isDiagonal = curNode.X - parent.X != 0 && curNode.Y - parent.Y != 0;

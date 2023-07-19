@@ -207,14 +207,21 @@ public class FinderAstar : IPathFinder
 
         Node curTile = null;
 
+        //목표에 근사한 노드로, 만약 목적지를 찾지 못했을 경우 사용된다.
+        Node approTile = null;
+
         while (openList.Count > 0)
         {
             curTile = openList.Dequeue();
 
+            if (approTile == null || approTile.F >= curTile.F)
+            {
+                approTile = curTile;
+            }
+
             // 경로를 찾았다.
             if (curTile.Index == _destIndex)
             {
-                Debug.Log("Find Path");
                 break;
             }
 
@@ -226,11 +233,10 @@ public class FinderAstar : IPathFinder
 
         }
 
-        // 목적지까지 가는 경로가 없는경우.
         if (curTile.Index != _destIndex)
         {
-            Debug.Log("None Path");
-            return false;
+            // 최종 타일이 목표 타일이 아닌경우, 목표와 가장 근사한 위치의 타일을 목표로 잡고 탐색한다.
+            curTile = approTile;
         }
 
         while (curTile != null)

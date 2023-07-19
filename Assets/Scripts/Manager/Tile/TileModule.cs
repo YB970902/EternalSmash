@@ -95,7 +95,7 @@ public class TileModule
         pathFindRequests = new LinkedList<PathFindRequest>();
         movableObjects = new List<IMovable>(CharacterPoolCount);
         
-        pathFinder = new FinderAstar();
+        pathFinder = new FinderJPS();
         pathFinder.Init();
     }
 
