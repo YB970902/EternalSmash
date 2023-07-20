@@ -1,4 +1,5 @@
 using Define;
+using UnityEngine;
 
 /// <summary>
 /// 행동 노드의 기본 클래스
@@ -7,6 +8,14 @@ public abstract class BTExecuteNodeBase : BTNodeBase
 {
     protected override void Init(BTData _data)
     {
+        if (_data is not BTExecuteData)
+        {
+            Debug.LogError("Data type is not BTExecuteData");
+            return;
+        }
+        
+        Data = _data;
+        
         Init();
     }
     

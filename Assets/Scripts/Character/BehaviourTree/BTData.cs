@@ -54,6 +54,16 @@ public class BTRootData : BTData
     }
 }
 
+public class BTExecuteData : BTData
+{
+    public static BTExecuteData Create(int _id)
+    {
+        var result = new BTExecuteData();
+        result.ID = _id;
+        return result;
+    }
+}
+
 public class BTSelectorData : BTData
 {
     public List<BTNodeBase> Children { get; private set; }
