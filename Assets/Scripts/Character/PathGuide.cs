@@ -26,11 +26,13 @@ public class PathGuide
     /// <summary> 이동할 오브젝트의 이동 관리자 </summary>
     private MovementController controller;
 
-    /// <summary>
-    /// 경로를 받기 위해 대기중인지 여부
-    /// </summary>
-    private bool isWaitPath;
+    /// <summary> 경로를 받기 위해 대기중인지 여부 </summary>
+    public bool IsWaitPath { get; private set; }
 
+    /// <summary> 이동할 준비가 되었는지 여부. </summary>
+    public bool IsReadyToMove { get; private set; }
+    
+    /// <summary> 이동중인지 여부 </summary>
     public bool IsMove => controller.IsMove;
 
     /// <summary>
@@ -43,7 +45,8 @@ public class PathGuide
         path.Clear();
         curPathIndex = Define.Tile.InvalidTileIndex;
         
-        isWaitPath = false;
+        IsWaitPath = false;
+        IsReadyToMove = false;
     }
 
     /// <summary>
@@ -65,17 +68,17 @@ public class PathGuide
         path.Clear();
         
         // 경로를 받기 위해 대기중인 경우 길찾기를 취소한다.
-        if (isWaitPath)
+        if (IsWaitPath)
         {
             BattleManager.Instance.Tile.CancelPathFind(this);
-            isWaitPath = false;
+            IsWaitPath = false;
         }
     }
 
     public Define.BehaviourTree.BTState Tick()
     {
         // 아직 길찾기 중인경우 Running을 반환한다.
-        if (isWaitPath) return BehaviourTree.BTState.Running;
+        if (IsWaitPath) return BehaviourTree.BTState.Running;
 
         bool result = controller.Tick();
 
@@ -121,11 +124,11 @@ public class PathGuide
     /// </summary>
     public void SetTargetIndex(int _index)
     {
-        targetIndex = _index;
+        targetIndex = BattleManager.Instance.Tile.GetNearOpenNode(startIndex, _index);
 
-        if (isWaitPath)
+        if (IsWaitPath)
         {
-            // 경로를 받기까지 대기하고있는 상황에서 목적지가 바뀌게 되면 목적지를 갱신한다. 
+            // 이미 경로를 받기위해 대기중이라면 목적지를 갱신한다. 
             BattleManager.Instance.Tile.UpdateDestIndex(this, targetIndex);
             return;
         }
@@ -134,7 +137,8 @@ public class PathGuide
         BattleManager.Instance.Tile.RequestPathFind(this, path, startIndex, targetIndex, OnFindPath);
         
         // 경로를 기다린다.
-        isWaitPath = true;
+        IsWaitPath = true;
+        IsReadyToMove = false;
     }
 
     /// <summary>
@@ -143,14 +147,25 @@ public class PathGuide
     private void OnFindPath()
     {
         // 더이상 경로를 기다리지 않는다.
-        isWaitPath = false;
+        IsWaitPath = false;
+        // 이동할 준비가 되었다.
+        IsReadyToMove = true;
         
         // 경로가 없을경우 반환한다.
         // TODO : 반환보다는 일정시간 대기후에 다시 길찾기를 시도하는게 좋아보인다.
         if (path.Count == 0) return;
+        IsReadyToMove = true;
+    }
 
+    /// <summary>
+    /// 이동을 시작하기위해 세팅한다.
+    /// </summary>
+    public void SetMoveStart()
+    {
         curPathIndex = 0;
+        startIndex = GetPath();
         controller.SetNextTile(path[curPathIndex]);
+        IsReadyToMove = false;
     }
 
     private int GetPath()
