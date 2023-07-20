@@ -122,6 +122,7 @@ public class BTIfData : BTData
 
 public class BTWhileData : BTData
 {
+    /// <summary> 반복 횟수. 0이면 무한반복이다. </summary>
     public int RepeatCount { get; private set; }
     
     public BTNodeBase Child { get; private set; }

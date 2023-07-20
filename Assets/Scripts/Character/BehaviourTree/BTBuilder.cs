@@ -81,6 +81,29 @@ public class BTBuilder
         return this;
     }
 
+    public BTBuilder AddWhileNode(BTWhileData _data, int _parentId)
+    {
+        var parentNode = GetNode(_parentId);
+
+        var node = new BTWhile();
+        node.Init(parentNode.OnChildEvaluted, controller, _data);
+        
+        AddNodeAndData(node, _data);
+
+        return this;
+    }
+    
+    public BTBuilder AddExecuteNode(BTExecuteNodeBase _node, BTExecuteData _data, int _parentId)
+    {
+        var parentNode = GetNode(_parentId);
+        
+        _node.Init(parentNode.OnChildEvaluted, controller, _data);
+        
+        AddNodeAndData(_node, _data);
+
+        return this;
+    }
+
     private void AddNodeAndData(BTNodeBase _node, BTData _data)
     {
         nodeBases.Add(_node);
