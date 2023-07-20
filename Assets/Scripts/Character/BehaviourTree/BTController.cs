@@ -14,6 +14,8 @@ public class BTController
     private BTRoot rootNode;
     /// <summary> 현재 동작중인 노드 </summary>
     private BTControlNodeBase runningNode;
+    /// <summary> 행동에 관련된 데이터 모음 </summary>
+    public BTBlackBoard BlackBoard { get; private set; }
 
     /// <summary> 길찾기 가이드 </summary>
     public PathGuide PathGuide { get; private set; }
@@ -30,6 +32,8 @@ public class BTController
     {
         PathGuide = new PathGuide();
         PathGuide.Set(_obj.GetComponent<MovementController>(), _startIndex);
+
+        BlackBoard = new BTBlackBoard();
     }
     
     /// <summary>
