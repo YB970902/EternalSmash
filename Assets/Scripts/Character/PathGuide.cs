@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Battle;
 using Character;
+using Define;
 using UnityEngine;
 
 /// <summary>
@@ -10,7 +11,7 @@ using UnityEngine;
 /// 다음경로가 막혀있을때나 특정 주기가 되었을 때 새 경로를 탐색한다.
 /// TileManager를 통해 관리된다.
 /// </summary>
-public class PathGuide : MonoBehaviour
+public class PathGuide
 {
     /// <summary> 이동을 시작하는 타일의 인덱스 </summary>
     private int startIndex;
@@ -19,10 +20,7 @@ public class PathGuide : MonoBehaviour
 
     /// <summary> 이동해야 하는 경로 </summary>
     private List<int> path = new List<int>(TileModule.TotalCount);
-    /// <summary>
-    /// 현재 경로의 인덱스.
-    /// 경로의 앞부분을 자꾸 지우면 연산이 크기 때문에 인덱스를 사용한다.
-    /// </summary>
+    /// <summary> 현재 경로의 인덱스 </summary>
     private int curPathIndex;
 
     /// <summary> 이동할 오브젝트의 이동 관리자 </summary>
@@ -32,9 +30,9 @@ public class PathGuide : MonoBehaviour
     /// 경로를 받기 위해 대기중인지 여부
     /// </summary>
     private bool isWaitPath;
-    
-    public bool IsEnable { get; private set; }
-    
+
+    public bool IsMove => controller.IsMove;
+
     /// <summary>
     /// 초기화
     /// </summary>
@@ -46,23 +44,16 @@ public class PathGuide : MonoBehaviour
         curPathIndex = Define.Tile.InvalidTileIndex;
         
         isWaitPath = false;
-        IsEnable = true;
-        
-        if (controller != null)
-        {
-            controller.onArrive.RemoveListener(OnArriveTarget);
-            controller = null;
-        }
     }
 
     /// <summary>
     /// 이동 관리자를 할당
     /// </summary>
-    public void Set(MovementController _controller)
+    public void Set(MovementController _controller, int _startIndex)
     {
         Init();
         controller = _controller;
-        _controller.onArrive.AddListener(OnArriveTarget);
+        SetStartIndex(_startIndex);
     }
 
     /// <summary>
@@ -70,10 +61,8 @@ public class PathGuide : MonoBehaviour
     /// </summary>
     public void Relase()
     {
-        controller.onArrive.RemoveListener(OnArriveTarget);
         controller = null;
         path.Clear();
-        IsEnable = false;
         
         // 경로를 받기 위해 대기중인 경우 길찾기를 취소한다.
         if (isWaitPath)
@@ -83,17 +72,44 @@ public class PathGuide : MonoBehaviour
         }
     }
 
+    public Define.BehaviourTree.BTState Tick()
+    {
+        // 아직 길찾기 중인경우 Running을 반환한다.
+        if (isWaitPath) return BehaviourTree.BTState.Running;
+
+        bool result = controller.Tick();
+
+        // 아직 이동중이라면 Running을 반환한다.
+        if (result == false) return BehaviourTree.BTState.Running;
+
+        // 이동을 마친경우, 시작 인덱스를 수정한다.
+        startIndex = GetPath();
+        ++curPathIndex;
+        
+        // 최종 목적지에 도착
+        if (path.Count <= curPathIndex)
+        {
+            // 최종 목적지에 도착하면 Fail을 반환한다.
+            return BehaviourTree.BTState.Fail;
+        }
+
+        // 다음 경로 설정
+        controller.SetNextTile(GetPath());
+
+        return BehaviourTree.BTState.Success;
+    }
+
     /// <summary>
     /// 시작 위치 설정
     /// 관리중인 오브젝트도 해당 위치로 이동시킨다.
     /// </summary>
-    public void SetStartIndex(int _index)
+    private void SetStartIndex(int _index)
     {
         if (Define.Tile.InvalidTileIndex != startIndex)
         {
             // 이미 어딘가에 위치해 있는 상황에서 순간이동이라면, 점거를 해제해야 한다.
             SetOccupied(startIndex, false);
-            SetOccupied(GetNextPath(), false);
+            SetOccupied(GetPath(), false);
         }
         startIndex = _index;
         controller.SetPosition(_index);
@@ -122,19 +138,6 @@ public class PathGuide : MonoBehaviour
     }
 
     /// <summary>
-    /// 다음 타일에 도착했을 때
-    /// </summary>
-    private void OnArriveTarget()
-    {
-        startIndex = path[curPathIndex];
-        ++curPathIndex;
-        // 최종 목적지에 도착
-        if (path.Count <= curPathIndex) return;
-        
-        controller.SetNextTile(GetNextPath());
-    }
-
-    /// <summary>
     /// 길찾기를 마친 경우 호출.
     /// </summary>
     private void OnFindPath()
@@ -150,7 +153,7 @@ public class PathGuide : MonoBehaviour
         controller.SetNextTile(path[curPathIndex]);
     }
 
-    private int GetNextPath()
+    private int GetPath()
     {
         if (path.Count <= curPathIndex) return Define.Tile.InvalidTileIndex;
         return path[curPathIndex];

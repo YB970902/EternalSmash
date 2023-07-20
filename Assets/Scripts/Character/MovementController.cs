@@ -32,9 +32,6 @@ namespace Character
         /// <summary> 지금까지 카운트된 틱 </summary>
         private int curCountTick;
 
-        /// <summary> 목표에 도착했을 경우 호출되는 이벤트 </summary>
-        public UnityEvent onArrive { get; private set; }
-
         public void Init()
         {
             position = FixVector2.Zero;
@@ -42,7 +39,6 @@ namespace Character
             targetPosition = FixVector2.Zero;
             curCountTick = 0;
             IsMove = false;
-            onArrive = new UnityEvent();
         }
 
         /// <summary>
@@ -75,18 +71,12 @@ namespace Character
         }
 
         /// <summary>
-        /// 목적지에 도착했을때 호출
+        /// 이동하도록 업데이트하는 함수.
+        /// 다음 타일로 이동에 성공하면 True를 반환한다.
         /// </summary>
-        private void OnArriveToTargetPosition()
+        public bool Tick()
         {
-            IsMove = false;
-            SetPosition(targetPosition);
-            onArrive.Invoke();
-        }
-
-        public void Tick()
-        {
-            if (IsMove == false) return;
+            if (IsMove == false) return false;
             
             ++curCountTick;
             Fix64 t = (Fix64)curCountTick / (Fix64)moveSpeed;
@@ -95,8 +85,11 @@ namespace Character
             {
                 IsMove = false;
                 curCountTick = 0;
-                OnArriveToTargetPosition();
+                SetPosition(targetPosition);
+                return true;
             }
+
+            return false;
         }
     }
 }

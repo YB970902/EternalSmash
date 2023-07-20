@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Character;
 using UnityEngine;
 
 using static Define.BehaviourTree;
@@ -9,14 +10,41 @@ using static Define.BehaviourTree;
 /// </summary>
 public class BTController
 {
+    /// <summary> 루트 노드 </summary>
+    private BTRoot rootNode;
     /// <summary> 현재 동작중인 노드 </summary>
     private BTControlNodeBase runningNode;
 
-    private BTRoot rootNode;
+    /// <summary> 길찾기 가이드 </summary>
+    public PathGuide PathGuide { get; private set; }
 
     public BTController(BTRoot _rootNode)
     {
         rootNode = _rootNode;
+    }
+
+    /// <summary>
+    /// 생성될때 초기화하는 함수.
+    /// </summary>
+    public void Init(GameObject _obj, int _startIndex)
+    {
+        PathGuide = new PathGuide();
+        PathGuide.Set(_obj.GetComponent<MovementController>(), _startIndex);
+    }
+    
+    /// <summary>
+    /// 노드를 실행하는 함수
+    /// </summary>
+    public void Execute()
+    {
+        if (runningNode != null)
+        {
+            runningNode.Evaluate();
+        }
+        else
+        {
+            rootNode.Evaluate();
+        }
     }
 
     /// <summary>
@@ -32,17 +60,10 @@ public class BTController
 
         return null;
     }
-
-    private bool True()
-    {
-        return true;
-    }
-
-    private bool False()
-    {
-        return false;
-    }
     
+    /// <summary>
+    /// 현재 실행중인 노드를 설정하는 함수
+    /// </summary>
     public void SetRunningNode(BTControlNodeBase _runningNode)
     {
         if (runningNode != _runningNode)
@@ -53,4 +74,18 @@ public class BTController
 
         runningNode = _runningNode;
     }
+    
+    #region ConditionalFunction
+    
+    private bool True()
+    {
+        return true;
+    }
+
+    private bool False()
+    {
+        return false;
+    }
+    
+    #endregion
 }
