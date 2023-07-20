@@ -92,8 +92,6 @@ public class TileModule
 
     /// <summary> 경로 검색을 요청한 PathGuide </summary>
     private LinkedList<PathFindRequest> pathFindRequests;
-    /// <summary> 타일위에 놓인 이동 가능한 오브젝트 </summary>
-    private List<Battle.IMovable> movableObjects;
     
     /// <summary> 경로 탐색기 </summary>
     private IPathFinder pathFinder;
@@ -103,7 +101,6 @@ public class TileModule
         pathFindRequestPool = new ObjectPool<PathFindRequest>(CharacterPoolCount);
 
         pathFindRequests = new LinkedList<PathFindRequest>();
-        movableObjects = new List<IMovable>(CharacterPoolCount);
         
         pathFinder = new FinderJPS();
         pathFinder.Init();

@@ -14,7 +14,7 @@ namespace Character
     /// 외부에서 index를 입력받으면 TileManager를 통해 이동할 경로를 알아낸다.
     /// 직접 이동할 곳을 찾거나 하진 않고 외부에서 입력받도록 설계되었다.
     /// </summary>
-    public class MovementController : MonoBehaviour, IMovable
+    public class MovementController : MonoBehaviour
     {
         /// <summary> 타일을 하나 건너는데 드는 틱 </summary>
         [SerializeField] private int moveSpeed = 100;
