@@ -119,3 +119,19 @@ public class BTIfData : BTData
         return result;
     }
 }
+
+public class BTWhileData : BTData
+{
+    public int RepeatCount { get; private set; }
+    
+    public BTNodeBase Child { get; private set; }
+
+    public static BTWhileData Create(BTBuilder _builder, int _id, int _childId, int _repeatCount)
+    {
+        var result = new BTWhileData();
+        result.ID = _id;
+        result.AddSequence(_builder, result.Child, _childId);
+        result.RepeatCount = _repeatCount;
+        return result;
+    }
+}
