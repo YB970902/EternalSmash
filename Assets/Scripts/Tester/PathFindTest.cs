@@ -8,6 +8,7 @@ using Debug = UnityEngine.Debug;
 public class PathFindTest : MonoBehaviour
 {
     [SerializeField] TileTest prefabTile = null;
+    [SerializeField] CharacterTest prefabCharacter = null;
 
     [SerializeField] int obstacleCount = 0;
 
@@ -41,6 +42,11 @@ public class PathFindTest : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             PathFindTimeTest();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            SpawnCharacter();
         }
     }
 
@@ -137,5 +143,10 @@ public class PathFindTest : MonoBehaviour
         }
         
         Debug.Log($"평균 시간 : {totalTime / testCount}ms");
+    }
+
+    private void SpawnCharacter()
+    {
+        Instantiate(prefabCharacter);
     }
 }
