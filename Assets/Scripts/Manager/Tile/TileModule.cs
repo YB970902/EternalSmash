@@ -115,6 +115,7 @@ public class TileModule
 
         pathFinder.FindPath(requestObj.Path, requestObj.StartIndex, requestObj.DestIndex);
         requestObj.OnPathFindEnd();
+        pathFindRequestPool.Push(requestObj);
     }
 
     /// <summary>
