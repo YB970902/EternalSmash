@@ -22,7 +22,7 @@ public abstract class BTControlNodeBase : BTNodeBase
         curNodeIndex = 0;
     }
     
-    public override void OnChildEvaluted(Define.BehaviourTree.BTState _state)
+    public override void OnChildEvaluated(Define.BehaviourTree.BTState _state)
     {
         if (_state != Define.BehaviourTree.BTState.Running || isRunning != false) return;
         

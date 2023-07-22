@@ -39,9 +39,9 @@ public class BTIf : BTControlNodeBase
         }
     }
 
-    public override void OnChildEvaluted(BTState _state)
+    public override void OnChildEvaluated(BTState _state)
     {
-        base.OnChildEvaluted(_state);
+        base.OnChildEvaluated(_state);
 
         if (_state == BTState.Running) return;
 

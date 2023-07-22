@@ -62,7 +62,7 @@ public class BTBuilder
         var parentNode = GetNode(_parentId);
         
         var node = new BTSelector();
-        node.Init(parentNode.OnChildEvaluted, controller, _data);
+        node.Init(parentNode.OnChildEvaluated, controller, _data);
 
         AddNodeAndData(node, _data);
         
@@ -74,7 +74,7 @@ public class BTBuilder
         var parentNode = GetNode(_parentId);
         
         var node = new BTSequence();
-        node.Init(parentNode.OnChildEvaluted, controller, _data);
+        node.Init(parentNode.OnChildEvaluated, controller, _data);
 
         AddNodeAndData(node, _data);
         
@@ -86,7 +86,7 @@ public class BTBuilder
         var parentNode = GetNode(_parentId);
 
         var node = new BTWhile();
-        node.Init(parentNode.OnChildEvaluted, controller, _data);
+        node.Init(parentNode.OnChildEvaluated, controller, _data);
         
         AddNodeAndData(node, _data);
 
@@ -97,7 +97,7 @@ public class BTBuilder
     {
         var parentNode = GetNode(_parentId);
         
-        _node.Init(parentNode.OnChildEvaluted, controller, _data);
+        _node.Init(parentNode.OnChildEvaluated, controller, _data);
         
         AddNodeAndData(_node, _data);
 

@@ -24,9 +24,9 @@ public class BTSelector : BTControlNodeBase
         (Data as BTSelectorData).Children[curNodeIndex].Evaluate();
     }
 
-    public override void OnChildEvaluted(BTState _state)
+    public override void OnChildEvaluated(BTState _state)
     {
-        base.OnChildEvaluted(_state);
+        base.OnChildEvaluated(_state);
 
         if (_state == BTState.Success)
         {

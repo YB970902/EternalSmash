@@ -22,7 +22,7 @@ public abstract class BTExecuteNodeBase : BTNodeBase
     protected abstract void Init();
 
     // 행동 노드는 자식이 있을 수 없으므로 강제로 구현할 필요가 없게한다.
-    public override void OnChildEvaluted(BehaviourTree.BTState _state)
+    public override void OnChildEvaluated(BehaviourTree.BTState _state)
     { 
         
     }

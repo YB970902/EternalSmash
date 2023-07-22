@@ -25,9 +25,9 @@ public class BTWhile : BTControlNodeBase
         (Data as BTWhileData).Child.Evaluate();
     }
 
-    public override void OnChildEvaluted(BehaviourTree.BTState _state)
+    public override void OnChildEvaluated(BehaviourTree.BTState _state)
     {
-        base.OnChildEvaluted(_state);
+        base.OnChildEvaluated(_state);
 
         var data = (Data as BTWhileData);
         

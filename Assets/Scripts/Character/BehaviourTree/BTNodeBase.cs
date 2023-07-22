@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 using static Define.BehaviourTree;
 
 /// <summary>
@@ -38,5 +34,5 @@ public abstract class BTNodeBase
     /// <summary>
     /// 자식의 평가가 끝난경우 결과를 반환받는 함수.
     /// </summary>
-    public abstract void OnChildEvaluted(BTState _state);
+    public abstract void OnChildEvaluated(BTState _state);
 }
