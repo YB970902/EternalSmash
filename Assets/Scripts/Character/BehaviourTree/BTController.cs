@@ -70,12 +70,11 @@ public class BTController
     /// </summary>
     public void SetRunningNode(BTControlNodeBase _runningNode)
     {
-        if (runningNode != _runningNode)
-        {
-            // 동작중인 노드가 바뀌었다면, 기존 노드는 동작노드가 아니게 된다.
-            runningNode?.SetRunningEnd();
-        }
-
+        // 기존 노드와 같다면 반환한다.
+        if (runningNode == _runningNode) return;
+        
+        // 동작중인 노드를 바꾸기 전에 기존 노드를 종료한다.
+        runningNode?.SetRunningEnd();
         runningNode = _runningNode;
     }
     

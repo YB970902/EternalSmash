@@ -29,7 +29,7 @@ public class BTWhile : BTControlNodeBase
     {
         base.OnChildEvaluated(_state);
 
-        var data = (Data as BTWhileData);
+        var data = Data as BTWhileData;
         
         switch (_state)
         {
@@ -42,15 +42,10 @@ public class BTWhile : BTControlNodeBase
                     currentRepeatCount = 0;
                     btCaller.OnChildEvaluated(BehaviourTree.BTState.Success); // 성공 반환
                 }
-                
-                btCaller.OnChildEvaluated(BehaviourTree.BTState.Running);
                 break;
             case BehaviourTree.BTState.Fail:
                 currentRepeatCount = 0;
                 btCaller.OnChildEvaluated(BehaviourTree.BTState.Fail);
-                break;
-            default:
-                btCaller.OnChildEvaluated(BehaviourTree.BTState.Running);
                 break;
         }
     }
