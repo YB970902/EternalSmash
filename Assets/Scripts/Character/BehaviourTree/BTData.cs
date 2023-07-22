@@ -15,29 +15,16 @@ public class BTData
     /// <summary> 노드마다 부여되는 고유한 아이디. 1부터 시작한다. </summary>
     public int ID { get; protected set; }
 
-    /// <summary> 노드의 값을 받아내는 함수 </summary>
-    private System.Action initSequenceFunc;
+    /// <summary> 노드를 값을 받아내는 함수 </summary>
+    protected System.Action nodeSetSequence;
 
     /// <summary>
     /// 받아야하는 노드의 ID만 보관중이던 액션을 수행하는 함수.
     /// </summary>
     public void SetValue()
     {
-        initSequenceFunc?.Invoke();
-        initSequenceFunc = null;
-    }
-
-    /// <summary>
-    /// 노드의 값을 세팅할 수 있게끔 시퀀스에 넣는다
-    /// </summary>
-    protected void AddSequence(BTBuilder _builder, BTNodeBase _nodebase, int _nodeId)
-    {
-        initSequenceFunc += () => { _nodebase = _builder.GetNode(_nodeId); };
-    }
-    
-    protected void GetFunction(BTBuilder _builder, System.Func<bool> _func, string _funcName)
-    {
-        initSequenceFunc += () => { _func = _builder.GetFunction(_funcName); };
+        nodeSetSequence?.Invoke();
+        nodeSetSequence = null;
     }
 }
 
@@ -49,7 +36,7 @@ public class BTRootData : BTData
     {
         var result = new BTRootData();
         result.ID = _id;
-        result.AddSequence(_builder, result.Child, _childId);
+        result.nodeSetSequence += () => { result.Child = _builder.GetNode(_childId); };
         return result;
     }
 }
@@ -75,9 +62,9 @@ public class BTSelectorData : BTData
         for (int i = 0, count = _childrenId.Count; i < count; ++i)
         {
             result.Children.Add(null);
-            var child = result.Children[i];
+            var index = i;
             var nodeId = _childrenId[i];
-            result.AddSequence(_builder, child, nodeId);
+            result.nodeSetSequence += () => { result.Children[index] = _builder.GetNode(nodeId); };
         }
         return result;
     }
@@ -94,9 +81,9 @@ public class BTSequenceData : BTData
         for (int i = 0, count = _childrenId.Count; i < count; ++i)
         {
             result.Children.Add(null);
-            var child = result.Children[i];
+            var index = i;
             var nodeId = _childrenId[i];
-            result.AddSequence(_builder, child, nodeId);
+            result.nodeSetSequence += () => { result.Children[index] = _builder.GetNode(nodeId); };
         }
         return result;
     }
@@ -113,9 +100,9 @@ public class BTIfData : BTData
     {
         var result = new BTIfData();
         result.ID = _id;
-        result.AddSequence(_builder, result.TrueNode, _trueNodeId);
-        result.AddSequence(_builder, result.FalseNode, _falseNodeId);
-        result.GetFunction(_builder, result.ConditionalFunc, _funcName);
+        result.nodeSetSequence += () => { result.TrueNode = _builder.GetNode(_trueNodeId); };
+        result.nodeSetSequence += () => { result.FalseNode = _builder.GetNode(_falseNodeId); };
+        result.ConditionalFunc = _builder.GetFunction(_funcName);
         return result;
     }
 }
@@ -131,7 +118,7 @@ public class BTWhileData : BTData
     {
         var result = new BTWhileData();
         result.ID = _id;
-        result.AddSequence(_builder, result.Child, _childId);
+        result.nodeSetSequence += () => { result.Child = _builder.GetNode(_childId); };
         result.RepeatCount = _repeatCount;
         return result;
     }
