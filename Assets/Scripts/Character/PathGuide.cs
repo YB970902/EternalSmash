@@ -164,7 +164,7 @@ public class PathGuide
     {
         curPathIndex = 0;
         startIndex = GetPath();
-        controller.SetNextTile(path[curPathIndex]);
+        controller.SetNextTile(GetPath());
         IsReadyToMove = false;
     }
 
