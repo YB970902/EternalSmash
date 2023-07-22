@@ -30,7 +30,7 @@ public class BTSequence : BTControlNodeBase
 
         if (_state == BTState.Fail)
         {
-            cbEvaluate(BTState.Fail);
+            btCaller.OnChildEvaluated(BTState.Fail);
         }
         else if (_state == BTState.Success)
         {
@@ -38,7 +38,7 @@ public class BTSequence : BTControlNodeBase
             if (curNodeIndex >= (Data as BTSequenceData).Children.Count)
             {
                 // 모든 자식을 다 탐색했으나, 모든 노드가 Fail을 반환했다면, 부모에게 결과를 반환한다.
-                cbEvaluate(BTState.Success);
+                btCaller.OnChildEvaluated(BTState.Success);
             }
         }
     }

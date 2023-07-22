@@ -40,17 +40,17 @@ public class BTWhile : BTControlNodeBase
                 if (currentRepeatCount >= data.RepeatCount) // 반복횟수를 다 채운 경우
                 {
                     currentRepeatCount = 0;
-                    cbEvaluate(BehaviourTree.BTState.Success); // 성공 반환
+                    btCaller.OnChildEvaluated(BehaviourTree.BTState.Success); // 성공 반환
                 }
                 
-                cbEvaluate(BehaviourTree.BTState.Running);
+                btCaller.OnChildEvaluated(BehaviourTree.BTState.Running);
                 break;
             case BehaviourTree.BTState.Fail:
                 currentRepeatCount = 0;
-                cbEvaluate(BehaviourTree.BTState.Fail);
+                btCaller.OnChildEvaluated(BehaviourTree.BTState.Fail);
                 break;
             default:
-                cbEvaluate(BehaviourTree.BTState.Running);
+                btCaller.OnChildEvaluated(BehaviourTree.BTState.Running);
                 break;
         }
     }

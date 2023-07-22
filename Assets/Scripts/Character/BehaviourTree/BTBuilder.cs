@@ -57,47 +57,51 @@ public class BTBuilder
         return this;
     }
 
-    public BTBuilder AddSelectorNode(BTSelectorData _data, int _parentId)
+    public BTBuilder AddSelectorNode(BTCaller _caller, BTSelectorData _data, int _parentId)
     {
         var parentNode = GetNode(_parentId);
         
         var node = new BTSelector();
-        node.Init(parentNode.OnChildEvaluated, controller, _data);
+        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
+        node.Init(_caller, controller, _data);
 
         AddNodeAndData(node, _data);
         
         return this;
     }
     
-    public BTBuilder AddSequenceNode(BTSequenceData _data, int _parentId)
+    public BTBuilder AddSequenceNode(BTCaller _caller, BTSequenceData _data, int _parentId)
     {
         var parentNode = GetNode(_parentId);
         
         var node = new BTSequence();
-        node.Init(parentNode.OnChildEvaluated, controller, _data);
+        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
+        node.Init(_caller, controller, _data);
 
         AddNodeAndData(node, _data);
         
         return this;
     }
 
-    public BTBuilder AddWhileNode(BTWhileData _data, int _parentId)
+    public BTBuilder AddWhileNode(BTCaller _caller, BTWhileData _data, int _parentId)
     {
         var parentNode = GetNode(_parentId);
 
         var node = new BTWhile();
-        node.Init(parentNode.OnChildEvaluated, controller, _data);
+        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
+        node.Init(_caller, controller, _data);
         
         AddNodeAndData(node, _data);
 
         return this;
     }
     
-    public BTBuilder AddExecuteNode(BTExecuteNodeBase _node, BTExecuteData _data, int _parentId)
+    public BTBuilder AddExecuteNode(BTCaller _caller, BTExecuteNodeBase _node, BTExecuteData _data, int _parentId)
     {
         var parentNode = GetNode(_parentId);
         
-        _node.Init(parentNode.OnChildEvaluated, controller, _data);
+        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
+        _node.Init(_caller, controller, _data);
         
         AddNodeAndData(_node, _data);
 

@@ -17,6 +17,6 @@ public class BTSetRandomTargetIndex : BTExecuteNodeBase
     {
         // 랜덤한 위치로 지정한다.
         btController.BlackBoard.RandomTargetNode = Random.Range(0, TileModule.TotalCount);
-        cbEvaluate(BehaviourTree.BTState.Success);
+        btCaller.OnChildEvaluated(BehaviourTree.BTState.Success);
     }
 }

@@ -35,7 +35,7 @@ public class BTIf : BTControlNodeBase
         else
         {
             // 알맞는 노드가 비어있다면 부모 노드에게 Fail을 반환한다.
-            cbEvaluate(BTState.Fail);
+            btCaller.OnChildEvaluated(BTState.Fail);
         }
     }
 
@@ -45,6 +45,6 @@ public class BTIf : BTControlNodeBase
 
         if (_state == BTState.Running) return;
 
-        cbEvaluate(_state);
+        btCaller.OnChildEvaluated(_state);
     }
 }

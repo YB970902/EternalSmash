@@ -17,7 +17,7 @@ public class BTFindPathRandomTarget : BTExecuteNodeBase
         if (pathGuide.IsReadyToMove) // 경로 탐색이 완료된경우
         {
             pathGuide.SetMoveStart();
-            cbEvaluate(BehaviourTree.BTState.Success);
+            btCaller.OnChildEvaluated(BehaviourTree.BTState.Success);
             return;
         }
         
@@ -26,6 +26,6 @@ public class BTFindPathRandomTarget : BTExecuteNodeBase
             pathGuide.SetTargetIndex(btController.BlackBoard.RandomTargetNode);
         }
         
-        cbEvaluate(BehaviourTree.BTState.Running);
+        btCaller.OnChildEvaluated(BehaviourTree.BTState.Running);
     }
 }

@@ -11,6 +11,6 @@ public class BTMoveToTarget : BTExecuteNodeBase
     
     public override void Evaluate()
     {
-        cbEvaluate(btController.PathGuide.Tick());
+        btCaller.OnChildEvaluated(btController.PathGuide.Tick());
     }
 }

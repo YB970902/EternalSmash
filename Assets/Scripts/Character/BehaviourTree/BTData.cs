@@ -7,7 +7,7 @@ using UnityEngine;
 /// 각 노드별로 필요한 데이터들은 이 클래스로부 파생되어야 한다.
 /// 만약 BTNodeBase를 변수로 가지고 있어야 한다면, 노드의 Id를 따로 가지고 있어야 한다. 
 /// </summary>
-public abstract class BTData
+public class BTData
 {
     /// <summary> 노드의 아이디가 유효하지 않은지 구분하기 위한 값. </summary>
     public const int InvalidID = 0;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,6 +39,14 @@ namespace Define
             Running,
         }
 
+        [Flags]
+        public enum BTDebuggerFlag
+        {
+            None = 0,
+            CheckSuccess = 1 << 0,
+            CheckFail = 1 << 1,
+            CheckRunning = 1 << 2,
+        }
 
         public static class Conditional
         {
