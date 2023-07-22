@@ -612,13 +612,17 @@ public class FinderJPS : IPathFinder
         int y = targetY;
         
         // 한 방향으로 탐색할 횟수. 2회씩 늘어난다.
-        int stepCount = 2;
-        
-        while (stepCount <= TileModule.WidthCount)
+        int stepCount = 0;
+
+        int tileSize = Mathf.Max(TileModule.WidthCount, TileModule.HeightCount); 
+        while (stepCount <= tileSize)
         {
             // 탐색 시작 위치가 왼쪽위로 한칸씩 움직인다.
             x -= 1;
             y += 1;
+            
+            // 한 방향으로 탐색하는 범위인 스텝은 2칸씩 늘어난다
+            stepCount += 2;
             
             // 탐색이 가능한 노드를 찾았는지 여부
             bool isFindOpenNode = false;
@@ -633,7 +637,7 @@ public class FinderJPS : IPathFinder
                 
                 for (int j = 0; j < stepCount; ++j)
                 {
-                    if (IsObstacle(x, y))
+                    if (IsObstacle(x, y) == false)
                     {
                         isFindOpenNode = true;
                         int h = Node.CalcH(x, y, targetX, targetY);
@@ -650,8 +654,6 @@ public class FinderJPS : IPathFinder
             }
 
             if (isFindOpenNode) return minIndex;
-
-            stepCount += 2;
         }
 
         return _targetIndex;
@@ -669,7 +671,7 @@ public class FinderJPS : IPathFinder
 
     private bool IsObstacle(int _x, int _y)
     {
-        if (IsOutOfNode(_x, _y)) return false;
+        if (IsOutOfNode(_x, _y)) return true;
         return nodeList[TileModule.PosToIndex(_x, _y)].IsObstacle;
     }
 }
