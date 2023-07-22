@@ -31,9 +31,9 @@ public class PathGuide
 
     /// <summary> 이동할 준비가 되었는지 여부. </summary>
     public bool IsReadyToMove { get; private set; }
-    
-    /// <summary> 이동중인지 여부 </summary>
-    public bool IsMove => controller.IsMove;
+
+    /// <summary> 경로가 비어있는지 여부 </summary>
+    private bool IsPathEmpty => path.Count == 0;
 
     /// <summary>
     /// 초기화
@@ -80,6 +80,9 @@ public class PathGuide
         // 아직 길찾기 중인경우 Running을 반환한다.
         if (IsWaitPath) return BehaviourTree.BTState.Running;
 
+        // 경로가 없다면 Fail을 반환한다.
+        if (IsPathEmpty) return BehaviourTree.BTState.Fail;
+        
         bool result = controller.Tick();
 
         // 아직 이동중이라면 Running을 반환한다.
@@ -163,8 +166,11 @@ public class PathGuide
     public void SetMoveStart()
     {
         curPathIndex = 0;
-        startIndex = GetPath();
-        controller.SetNextTile(GetPath());
+        if (IsPathEmpty == false)
+        {
+            startIndex = GetPath();
+            controller.SetNextTile(GetPath());
+        }
         IsReadyToMove = false;
     }
 
