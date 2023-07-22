@@ -238,7 +238,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabTile: {fileID: 4569797695406845467, guid: a60c54f542ad543a3880d02f8eecbcdf, type: 3}
   prefabCharacter: {fileID: 8796139342950298389, guid: ed63198ae2aed4f0a85b68469f383a0b, type: 3}
-  obstacleCount: 1000
+  obstacleCount: 10
   listObstacle: 
   testCount: 1
 --- !u!4 &2096181988

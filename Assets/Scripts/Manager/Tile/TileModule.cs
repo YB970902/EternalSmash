@@ -75,8 +75,8 @@ public class TileModule
         }
     }
     
-    public const int WidthCount = 100;
-    public const int HeightCount = 100;
+    public const int WidthCount = 20;
+    public const int HeightCount = 20;
     public const int TotalCount = WidthCount * HeightCount;
 
     private static readonly FixVector2 TileSize = new FixVector2(1, 1);

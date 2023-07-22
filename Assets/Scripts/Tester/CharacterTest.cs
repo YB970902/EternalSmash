@@ -14,8 +14,8 @@ public class CharacterTest : MonoBehaviour
         // 2 : 시퀀스              3 : 리핏
         // 4 : 세팅, 5: 탐색        6 : 위치 이동
         var btBuilder = new BTBuilder();
-        var btCaller = new BTDebugCaller();
-        btCaller.Init(BehaviourTree.BTDebuggerFlag.CheckSuccess | BehaviourTree.BTDebuggerFlag.CheckFail | BehaviourTree.BTDebuggerFlag.CheckRunning);
+        var btCaller = new BTDefaultCaller();
+        //btCaller.Init(BehaviourTree.BTDebuggerFlag.CheckSuccess | BehaviourTree.BTDebuggerFlag.CheckFail | BehaviourTree.BTDebuggerFlag.CheckRunning);
         
         btController = btBuilder.AddRootNode(BTRootData.Create(btBuilder, 0, 1))
             .AddSequenceNode(btCaller.Clone(), BTSequenceData.Create(btBuilder, 1, new List<int>() { 2, 3 }), 0)

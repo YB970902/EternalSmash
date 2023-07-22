@@ -48,6 +48,24 @@ public class PathFindTest : MonoBehaviour
         {
             SpawnCharacter();
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            CreateRandomObstacle();
+        }
+    }
+
+    private void CreateRandomObstacle(List<int> _ignoreIndexList = null)
+    {
+        for (int i = 0; i < obstacleCount; ++i)
+        {
+            int randomIndex = Random.Range(0, TileModule.WidthCount * TileModule.HeightCount);
+
+            if (_ignoreIndexList?.Contains(randomIndex) ?? false) continue;
+
+            BattleManager.Instance.Tile.PathFinder.SetObstacle(randomIndex, true);
+            tileTestList[randomIndex].SetColor(TileTest.TileTestColorTag.Obstacle);
+        }
     }
 
     private void PathFindingTest()
@@ -68,15 +86,7 @@ public class PathFindTest : MonoBehaviour
 
         if (listObstacle == null || listObstacle.Count == 0)
         {
-            for (int i = 0; i < obstacleCount; ++i)
-            {
-                int randomIndex = Random.Range(0, TileModule.WidthCount * TileModule.HeightCount);
-
-                if (randomIndex == startIndex || randomIndex == destIndex) continue;
-
-                BattleManager.Instance.Tile.PathFinder.SetObstacle(randomIndex, true);
-                tileTestList[randomIndex].SetColor(TileTest.TileTestColorTag.Obstacle);
-            }
+            CreateRandomObstacle(new List<int>(2) { startIndex, destIndex });
         }
         else
         {
