@@ -179,13 +179,11 @@ public class FinderAstar : IPathFinder
 
     public void SetObstacle(int _index, bool _isObstacle)
     {
-        if (IsOutOfTile(_index)) return;
         tileList[_index].IsObstacle = _isObstacle;
     }
 
     public bool IsObstacle(int _index)
     {
-        if (IsOutOfTile(_index)) return true;
         return tileList[_index].IsObstacle;
     }
 

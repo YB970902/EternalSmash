@@ -519,16 +519,11 @@ public class FinderJPS : IPathFinder
     
     public void SetObstacle(int _index, bool _isObstacle)
     {
-        (int x, int y) = TileModule.IndexToPos(_index);
-        if (IsOutOfNode(x, y)) return;
-
         nodeList[_index].IsObstacle = _isObstacle;
     }
 
     public bool IsObstacle(int _index)
     {
-        (int x, int y) = TileModule.IndexToPos(_index);
-        if (IsOutOfNode(x, y)) return true;
         return nodeList[_index].IsObstacle;
     }
 
