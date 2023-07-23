@@ -19,6 +19,12 @@ public interface IPathFinder
     public void SetObstacle(int _index, bool _isObstacle);
 
     /// <summary>
+    /// 장애물인지 여부
+    /// </summary>
+    /// <returns></returns>
+    public bool IsObstacle(int _index);
+
+    /// <summary>
     /// 경로 탐색 성공 여부를 반환하고, 경로는 매개변수를 통해 반환한다.
     /// </summary>
     public bool FindPath(List<int> _path, int _startIndex, int _destIndex);
@@ -192,6 +198,16 @@ public class TileModule
         return _x + _y * WidthCount;
     }
 
+    public void SetObstacle(int _index, bool _isOccupied)
+    {
+        pathFinder.SetObstacle(_index, _isOccupied);
+    }
+
+    public bool IsObstacle(int _index)
+    {
+        return pathFinder.IsObstacle(_index);
+    }
+    
     public void SetOccupied(int _index, bool _isOccupied)
     {
         pathFinder.SetOccupied(_index, _isOccupied);

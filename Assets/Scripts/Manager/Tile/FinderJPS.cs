@@ -525,6 +525,13 @@ public class FinderJPS : IPathFinder
         nodeList[_index].IsObstacle = _isObstacle;
     }
 
+    public bool IsObstacle(int _index)
+    {
+        (int x, int y) = TileModule.IndexToPos(_index);
+        if (IsOutOfNode(x, y)) return true;
+        return nodeList[_index].IsObstacle;
+    }
+
     private bool IsOutOfNode(int _x, int _y)
     {
         return _x < 0 || _x >= TileModule.WidthCount || _y < 0 || _y >= TileModule.HeightCount;

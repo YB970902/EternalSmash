@@ -183,6 +183,12 @@ public class FinderAstar : IPathFinder
         tileList[_index].IsObstacle = _isObstacle;
     }
 
+    public bool IsObstacle(int _index)
+    {
+        if (IsOutOfTile(_index)) return true;
+        return tileList[_index].IsObstacle;
+    }
+
     public bool FindPath(List<int> _path, int _startIndex, int _destIndex)
     {
         _path.Clear();
