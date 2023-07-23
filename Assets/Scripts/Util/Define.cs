@@ -8,6 +8,9 @@ namespace Define
     public class Tile
     {
         public const int InvalidTileIndex = -1;
+
+        /// <summary> 다음 노드의 점유가 풀릴때까지 대기하는 수 </summary>
+        public const int WaitMoveCount = 10;
         
         public enum Direct
         {

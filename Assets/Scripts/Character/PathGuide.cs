@@ -26,6 +26,11 @@ public class PathGuide
     /// <summary> 이동할 오브젝트의 이동 관리자 </summary>
     private MovementController controller;
 
+    /// <summary> 대기하고 있었던 횟수 </summary>
+    private int currentWaitCount;
+    /// <summary> 다음 경로에 다른 유닛이 있어서 대기하고 있는지 여부 </summary>
+    private bool isWaitMove;
+
     /// <summary> 경로를 받기 위해 대기중인지 여부 </summary>
     public bool IsWaitPath { get; private set; }
 
@@ -36,25 +41,20 @@ public class PathGuide
     private bool IsPathEmpty => path.Count == 0;
 
     /// <summary>
-    /// 초기화
+    /// 이동 관리자를 할당
     /// </summary>
-    private void Init()
+    public void Init(MovementController _controller, int _startIndex)
     {
         startIndex = Define.Tile.InvalidTileIndex;
         targetIndex = Define.Tile.InvalidTileIndex;
         path.Clear();
         curPathIndex = Define.Tile.InvalidTileIndex;
-        
+
+        currentWaitCount = 0;
+        isWaitMove = false;
         IsWaitPath = false;
         IsReadyToMove = false;
-    }
-
-    /// <summary>
-    /// 이동 관리자를 할당
-    /// </summary>
-    public void Set(MovementController _controller, int _startIndex)
-    {
-        Init();
+        
         controller = _controller;
         SetStartIndex(_startIndex);
     }
@@ -82,25 +82,54 @@ public class PathGuide
 
         // 경로가 없다면 Fail을 반환한다.
         if (IsPathEmpty) return BehaviourTree.BTState.Fail;
+
+        if (isWaitMove) // 다음 경로를 다른 유닛이 점유한 경우
+        {
+            if (IsOccupied(GetPath())) // 여전히 점유중인 경우
+            {
+                // WaitMoveCount만큼 대기하다가 계속 점유중이면 새로운 경로를 찾는다.
+                ++currentWaitCount;
+                if (currentWaitCount < Define.Tile.WaitMoveCount) return BehaviourTree.BTState.Running;
+                isWaitMove = false;
+                currentWaitCount = 0;
+                SetTargetIndex(targetIndex, true);
+                return BehaviourTree.BTState.Running;
+            }
+            
+            // 다시 이동을 시작한다.
+            isWaitMove = false;
+            currentWaitCount = 0;
+            SetNextPath();
+        }
         
         bool result = controller.Tick();
 
         // 아직 이동중이라면 Running을 반환한다.
         if (result == false) return BehaviourTree.BTState.Running;
 
-        // 이동을 마친경우, 시작 인덱스를 수정한다.
+        // 이동 전 위치는 점유를 해제한다.
+        SetOccupied(startIndex, false);
         startIndex = GetPath();
         ++curPathIndex;
-        
-        // 최종 목적지에 도착
-        if (path.Count <= curPathIndex)
+
+        if (path.Count <= curPathIndex) return BehaviourTree.BTState.Fail; // 최종 목적지에 도착하면 Fail을 반환한다.
+ 
+        if (IsObstacle(GetPath())) // 다음 노드가 장애물인경우
         {
-            // 최종 목적지에 도착하면 Fail을 반환한다.
-            return BehaviourTree.BTState.Fail;
+            // 새로운 경로를 탐색한다.
+            SetTargetIndex(targetIndex, true);
+            return BehaviourTree.BTState.Success;
         }
 
-        // 다음 경로 설정
-        controller.SetNextTile(GetPath());
+        if (IsOccupied(GetPath())) // 다음 노드가 점유하고 있을경우
+        {
+            // 다음 노드의 점유가 풀릴때까지 대기한다.
+            isWaitMove = true;
+            currentWaitCount = 0;
+            return BehaviourTree.BTState.Success;
+        }
+
+        SetNextPath();
 
         return BehaviourTree.BTState.Success;
     }
@@ -111,12 +140,6 @@ public class PathGuide
     /// </summary>
     private void SetStartIndex(int _index)
     {
-        if (Define.Tile.InvalidTileIndex != startIndex)
-        {
-            // 이미 어딘가에 위치해 있는 상황에서 순간이동이라면, 점거를 해제해야 한다.
-            SetOccupied(startIndex, false);
-            SetOccupied(GetPath(), false);
-        }
         startIndex = _index;
         controller.SetPosition(_index);
         SetOccupied(startIndex, true);
@@ -125,7 +148,7 @@ public class PathGuide
     /// <summary>
     /// 이동할 목표 위치를 설정한다.
     /// </summary>
-    public void SetTargetIndex(int _index)
+    public void SetTargetIndex(int _index, bool _immediatelyMove = false)
     {
         targetIndex = BattleManager.Instance.Tile.GetNearOpenNode(startIndex, _index);
 
@@ -137,7 +160,7 @@ public class PathGuide
         }
 
         // 길찾기 요청을 보낸다.
-        BattleManager.Instance.Tile.RequestPathFind(this, path, startIndex, targetIndex, OnFindPath);
+        BattleManager.Instance.Tile.RequestPathFind(this, path, startIndex, targetIndex, _immediatelyMove ? OnFindPathAndMove : OnFindPath);
         
         // 경로를 기다린다.
         IsWaitPath = true;
@@ -151,6 +174,7 @@ public class PathGuide
     {
         // 더이상 경로를 기다리지 않는다.
         IsWaitPath = false;
+        isWaitMove = false;
         // 이동할 준비가 되었다.
         IsReadyToMove = true;
         
@@ -158,6 +182,12 @@ public class PathGuide
         // TODO : 반환보다는 일정시간 대기후에 다시 길찾기를 시도하는게 좋아보인다.
         if (path.Count == 0) return;
         IsReadyToMove = true;
+    }
+
+    private void OnFindPathAndMove()
+    {
+        OnFindPath();
+        SetMoveStart();
     }
 
     /// <summary>
@@ -168,8 +198,10 @@ public class PathGuide
         curPathIndex = 0;
         if (IsPathEmpty == false)
         {
+            SetOccupied(startIndex, false);
             startIndex = GetPath();
-            controller.SetNextTile(GetPath());
+            SetOccupied(startIndex, true);
+            SetNextPath();
         }
         IsReadyToMove = false;
     }
@@ -178,6 +210,16 @@ public class PathGuide
     {
         if (path.Count <= curPathIndex) return Define.Tile.InvalidTileIndex;
         return path[curPathIndex];
+    }
+
+    /// <summary>
+    /// 다음으로 이동해야 하는 노드의 위치를 설정한다.
+    /// </summary>
+    private void SetNextPath()
+    {
+        // 이동할 타일을 점유한다.
+        SetOccupied(GetPath(), true);
+        controller.SetNextTile(GetPath());
     }
 
     private void SetOccupied(int _index, bool _isOccupied)
@@ -192,5 +234,19 @@ public class PathGuide
         if (_index == Define.Tile.InvalidTileIndex) return true;
         
         return BattleManager.Instance.Tile.IsOccupied(_index);
+    }
+
+    private void SetObstacle(int _index, bool _isObstacle)
+    {
+        if (_index == Define.Tile.InvalidTileIndex) return;
+        
+        BattleManager.Instance.Tile.SetObstacle(_index, _isObstacle);
+    }
+
+    private bool IsObstacle(int _index)
+    {
+        if (_index == Define.Tile.InvalidTileIndex) return true;
+        
+        return BattleManager.Instance.Tile.IsObstacle(_index);
     }
 }
