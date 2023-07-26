@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Define;
@@ -36,5 +37,7 @@ public class BTTwoTickSuccess : BTExecuteNodeBase
         {
             btCaller.OnChildEvaluated(Define.BehaviourTree.BTState.Running);
         }
+        
+        Debug.Log($"NowMilliSeconds : [{DateTime.Now.Millisecond}]");
     }
 }

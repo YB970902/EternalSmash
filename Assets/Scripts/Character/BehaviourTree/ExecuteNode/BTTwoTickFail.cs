@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,5 +36,7 @@ public class BTTwoTickFail : BTExecuteNodeBase
         {
             btCaller.OnChildEvaluated(Define.BehaviourTree.BTState.Running);
         }
+        
+        Debug.Log($"NowMilliSeconds : [{DateTime.Now.Millisecond}]");
     }
 }
