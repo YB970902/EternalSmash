@@ -9,21 +9,19 @@ public class BTFindPathRandomTarget : BTExecuteNodeBase
     {
         
     }
-    
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        btController.PathGuide.SetTargetIndex(btController.BlackBoard.RandomTargetNode);
+    }
+
     public override void Evaluate()
     {
-        var pathGuide = btController.PathGuide;
-        
-        if (pathGuide.IsReadyToMove) // 경로 탐색이 완료된경우
+        if (btController.PathGuide.IsWaitPath == false) // 경로 탐색이 완료된경우
         {
-            pathGuide.SetMoveStart();
             btCaller.OnChildEvaluated(BehaviourTree.BTState.Success);
             return;
-        }
-        
-        if (pathGuide.IsWaitPath == false) // 아직 길찾기 시작을 안한경우
-        {
-            pathGuide.SetTargetIndex(btController.BlackBoard.RandomTargetNode);
         }
         
         btCaller.OnChildEvaluated(BehaviourTree.BTState.Running);
