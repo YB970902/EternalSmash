@@ -8,27 +8,25 @@ using UnityEngine;
 public abstract class BTControlNodeBase : BTNodeBase
 {
     /// <summary> 현재 동작중인 노드의 인덱스 </summary>
-    protected int curNodeIndex;
-    
-    /// <summary> 러닝 노드인지 여부 </summary>
-    protected bool isRunning;
+    protected int currentNodeIndex;
+
+    /// <summary> 현재 동작중인 노드 </summary>
+    protected BTNodeBase currentNode;
 
     /// <summary>
-    /// 러닝 노드 상태가 종료됨
+    /// Execute노드의 Enter가 호출된 직후인지 여부
+    /// Execute노드는 한 Tick당 한번 Evaluate되어야 하므로 체크한다.
     /// </summary>
-    public void SetRunningEnd()
+    protected bool isEnterExecuteNode;
+
+    protected override void Init(BTData _data)
     {
-        isRunning = false;
-        curNodeIndex = 0;
+        isEnterExecuteNode = false;
     }
-    
-    public override void OnChildEvaluated(Define.BehaviourTree.BTState _state)
+
+    public override void OnRunningEnd()
     {
-        if (_state != Define.BehaviourTree.BTState.Running || isRunning != false) return;
-        
-        //현재 평가중인 자식이 아직 동작중이라면, 자신은 RunningNode가 된다.
-        //또, 부모에게 결과를 반환하지 않는다.
-        btController.SetRunningNode(this);
-        isRunning = true;
+        base.OnRunningEnd();
+        OnExit();
     }
 }

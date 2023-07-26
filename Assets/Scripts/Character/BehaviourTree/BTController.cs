@@ -74,7 +74,7 @@ public class BTController
         if (runningNode == _runningNode) return;
         
         // 동작중인 노드를 바꾸기 전에 기존 노드를 종료한다.
-        runningNode?.SetRunningEnd();
+        runningNode?.OnRunningEnd();
         runningNode = _runningNode;
     }
     
