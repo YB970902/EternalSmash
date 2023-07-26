@@ -6,6 +6,9 @@ using static Define.BehaviourTree;
 public abstract class BTNodeBase
 {
     public BTData Data { get; protected set; }
+    
+    /// <summary> 말단 노드인지 체크하기 위한 플래그 </summary>
+    public bool IsExecuteNode { get; protected set; }
 
     protected BTController btController;
 
@@ -18,6 +21,7 @@ public abstract class BTNodeBase
     {
         btCaller = _btCaller;
         btController = _btController;
+        IsExecuteNode = false;
         Init(_data);
     }
 

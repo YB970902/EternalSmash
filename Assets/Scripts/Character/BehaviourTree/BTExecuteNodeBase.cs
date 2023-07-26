@@ -15,13 +15,17 @@ public abstract class BTExecuteNodeBase : BTNodeBase
         }
         
         Data = _data;
+        IsExecuteNode = true;
         
         Init();
     }
     
     protected abstract void Init();
 
-    // 행동 노드는 자식이 있을 수 없으므로 강제로 구현할 필요가 없게한다.
+    /// <summary>
+    /// 행동 노드는 자식이 있을 수 없으므로 강제로 구현할 필요가 없게한다.
+    /// 없앨 수 있다면 없애는게 낫겠다.
+    /// </summary>
     public override void OnChildEvaluated(BehaviourTree.BTState _state)
     { 
         

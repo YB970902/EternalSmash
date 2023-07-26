@@ -22,51 +22,57 @@ public class BTSelector : BTControlNodeBase
     public override void OnEnter()
     {
         base.OnEnter();
-        Debug.Log("OnSelectorEnter");
-        (Data as BTSelectorData).Children[curNodeIndex].OnEnter();
-    }
-
-    public override void OnExit()
-    {
-        base.OnExit();
-        Debug.Log("OnSelectorExit");
+        currentNodeIndex = 0;
+        currentNode = (Data as BTSelectorData).Children[currentNodeIndex];
+        currentNode.OnEnter();
+        
+        if (currentNode.IsExecuteNode)
+        {
+            isEnterExecuteNode = true;
+            btController.SetRunningNode(this);
+        }
     }
 
     public override void Evaluate()
     {
-        (Data as BTSelectorData).Children[curNodeIndex].Evaluate();
+        if (isEnterExecuteNode)
+        {
+            isEnterExecuteNode = false;
+            return;
+        }
+        currentNode.Evaluate();
     }
 
     public override void OnChildEvaluated(BTState _state)
     {
-        base.OnChildEvaluated(_state);
-
         var data = Data as BTSelectorData;
-        
-        if (_state == BTState.Success)
+
+        switch (_state)
         {
-            data.Children[curNodeIndex].OnExit();
-            curNodeIndex = 0;
-            btCaller.OnChildEvaluated(BTState.Success);
-        }
-        else if (_state == BTState.Fail)
-        {
-            data.Children[curNodeIndex].OnExit();
-            ++curNodeIndex;
-            if (curNodeIndex >= (Data as BTSelectorData).Children.Count)
-            {
-                // 모든 자식을 다 탐색했으나, 모든 노드가 Fail을 반환했다면, 부모에게 결과를 반환한다.
-                curNodeIndex = 0;
-                btCaller.OnChildEvaluated(BTState.Fail);
-                return;
-            }
-            
-            if (isRunning == false)
-            {
-                // 노드가 옮겨질때마다 저장한다.
-                btController.SetRunningNode(this);
-            }
-            data.Children[curNodeIndex].OnEnter();
+            case BTState.Success:
+                currentNode.OnExit();
+                currentNodeIndex = 0;
+                btCaller.OnChildEvaluated(BTState.Success);
+                break;
+            case BTState.Fail:
+                currentNode.OnExit();
+                ++currentNodeIndex;
+                if (currentNodeIndex >= data.Children.Count)
+                {
+                    // 모든 자식을 다 탐색했으나, 모든 노드가 Fail을 반환했다면, 부모에게 결과를 반환한다.
+                    btCaller.OnChildEvaluated(BTState.Fail);
+                    return;
+                }
+
+                currentNode = data.Children[currentNodeIndex];
+                currentNode.OnEnter();
+
+                if (currentNode.IsExecuteNode)
+                {
+                    isEnterExecuteNode = true;
+                    btController.SetRunningNode(this);
+                }
+                break;
         }
     }
 }

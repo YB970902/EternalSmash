@@ -12,6 +12,7 @@ public class BTIf : BTControlNodeBase
 {
     /// <summary> 조건 함수의 결과가 참인지 거짓인지 여부 </summary>
     private bool isTrue;
+
     protected override void Init(BTData _data)
     {
         if (_data is not BTIfData)
@@ -21,40 +22,36 @@ public class BTIf : BTControlNodeBase
         }
 
         Data = _data;
+        currentNode = null;
     }
 
     public override void OnEnter()
     {
-        Debug.Log("OnIfEnter");
         base.OnEnter();
-        isTrue = (Data as BTIfData).ConditionalFunc.Invoke();
         var data = Data as BTIfData;
-        if (isTrue)
+        
+        isTrue = data.ConditionalFunc.Invoke();
+        currentNode = isTrue ? data.TrueNode : data.FalseNode;
+        currentNode?.OnEnter();
+        
+        if (currentNode?.IsExecuteNode ?? false)
         {
-            data.TrueNode?.OnEnter();
+            isEnterExecuteNode = true;
+            btController.SetRunningNode(this);
         }
-        else
-        {
-            data.FalseNode?.OnEnter();
-        }
-    }
-
-    public override void OnExit()
-    {
-        base.OnExit();
-        Debug.Log("OnIfExit");
     }
 
     public override void Evaluate()
     {
-        var data = Data as BTIfData;
-        if (isTrue && data.TrueNode != null)
+        if (isEnterExecuteNode)
         {
-            data.TrueNode.Evaluate();
+            isEnterExecuteNode = false;
+            return;
         }
-        else if (isTrue == false && data.FalseNode != null)
+        
+        if (currentNode != null)
         {
-            data.FalseNode.Evaluate();
+            currentNode.Evaluate();
         }
         else
         {
@@ -65,20 +62,9 @@ public class BTIf : BTControlNodeBase
 
     public override void OnChildEvaluated(BTState _state)
     {
-        base.OnChildEvaluated(_state);
-
         if (_state == BTState.Running) return;
 
-        var data = Data as BTIfData;
-        
-        if (isTrue)
-        {
-            data.TrueNode?.OnExit();            
-        }
-        else
-        {
-            data.FalseNode?.OnExit();
-        }
+        currentNode?.OnExit();
         
         btCaller.OnChildEvaluated(_state);
     }
