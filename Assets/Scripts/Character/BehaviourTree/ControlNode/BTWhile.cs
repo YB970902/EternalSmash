@@ -20,6 +20,12 @@ public class BTWhile : BTControlNodeBase
         currentRepeatCount = 0;
     }
 
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        (Data as BTWhileData).Child.OnEnter();
+    }
+
     public override void Evaluate()
     {
         (Data as BTWhileData).Child.Evaluate();
@@ -34,14 +40,23 @@ public class BTWhile : BTControlNodeBase
         switch (_state)
         {
             case BehaviourTree.BTState.Success:
-                if (data.RepeatCount == 0) break;
+                data.Child.OnExit();
+                
+                if (data.RepeatCount == 0)
+                {
+                    data.Child.OnEnter();
+                    break;
+                }
                 
                 ++currentRepeatCount;
                 if (currentRepeatCount >= data.RepeatCount) // 반복횟수를 다 채운 경우
                 {
                     currentRepeatCount = 0;
                     btCaller.OnChildEvaluated(BehaviourTree.BTState.Success); // 성공 반환
+                    break;
                 }
+                
+                data.Child.OnEnter();
                 break;
             case BehaviourTree.BTState.Fail:
                 currentRepeatCount = 0;

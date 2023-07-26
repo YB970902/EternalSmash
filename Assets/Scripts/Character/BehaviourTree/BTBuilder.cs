@@ -83,6 +83,19 @@ public class BTBuilder
         return this;
     }
 
+    public BTBuilder AddIfNode(BTCaller _caller, BTIfData _data, int _parentId)
+    {
+        var parentNode = GetNode(_parentId);
+
+        var node = new BTIf();
+        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
+        node.Init(_caller, controller, _data);
+        
+        AddNodeAndData(node, _data);
+
+        return this;
+    }
+    
     public BTBuilder AddWhileNode(BTCaller _caller, BTWhileData _data, int _parentId)
     {
         var parentNode = GetNode(_parentId);

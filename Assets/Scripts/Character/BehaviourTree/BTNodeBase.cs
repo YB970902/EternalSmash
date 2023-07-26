@@ -32,6 +32,30 @@ public abstract class BTNodeBase
     public abstract void Evaluate();
 
     /// <summary>
+    /// 첫 Evaluate가 호출되기 전에 호출되는 함수
+    /// </summary>
+    public virtual void OnEnter()
+    {
+        
+    }
+
+    /// <summary>
+    /// 마지막 Evaluate가 호출된 후에 호출되는 함수 
+    /// </summary>
+    public virtual void OnExit()
+    {
+        
+    }
+
+    /// <summary>
+    /// 진행중인 노드가 도중에 중단될때 호출되는 함수
+    /// </summary>
+    public virtual void OnRunningEnd()
+    {
+        
+    }
+
+    /// <summary>
     /// 자식의 평가가 끝난경우 결과를 반환받는 함수.
     /// </summary>
     public abstract void OnChildEvaluated(BTState _state);
