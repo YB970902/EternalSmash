@@ -122,7 +122,7 @@ public class FinderJPS : IPathFinder
         }
     }
 
-    public bool FindPath(List<int> _path, int _startIndex, int _destIndex)
+    public bool FindPath(List<int> _path, int _startIndex, int _destIndex, int _tempObstacleIndex)
     {
         _path.Clear();
         
@@ -145,6 +145,18 @@ public class FinderJPS : IPathFinder
         {
             Debug.Log("출발지 혹은 목적지가 장애물임");
             return false;
+        }
+        
+        if (_tempObstacleIndex != InvalidTileIndex)
+        {
+            if (IsObstacle(_tempObstacleIndex) || _tempObstacleIndex == _destIndex)
+            {
+                _tempObstacleIndex = InvalidTileIndex;
+            }
+            else
+            {
+                SetObstacle(_tempObstacleIndex, true);
+            }
         }
 
         openList.Clear();
@@ -218,6 +230,11 @@ public class FinderJPS : IPathFinder
 
         // 목적지에서부터 출발지로 오는 경로이기 때문에 뒤집는다.
         _path.Reverse();
+        
+        if (_tempObstacleIndex != InvalidTileIndex)
+        {
+            SetObstacle(_tempObstacleIndex, false);
+        }
         
         return true;
     }

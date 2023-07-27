@@ -187,7 +187,7 @@ public class FinderAstar : IPathFinder
         return tileList[_index].IsObstacle;
     }
 
-    public bool FindPath(List<int> _path, int _startIndex, int _destIndex)
+    public bool FindPath(List<int> _path, int _startIndex, int _destIndex, int _tempObstacleIndex)
     {
         _path.Clear();
         // 타일이 범위를 벗어난 경우
@@ -202,6 +202,18 @@ public class FinderAstar : IPathFinder
         {
             Debug.Log("Already at destination");
             return false;
+        }
+
+        if (_tempObstacleIndex != InvalidTileIndex)
+        {
+            if (IsObstacle(_tempObstacleIndex) || _tempObstacleIndex == _destIndex)
+            {
+                _tempObstacleIndex = InvalidTileIndex;
+            }
+            else
+            {
+                SetObstacle(_tempObstacleIndex, true);
+            }
         }
 
         tileList.ForEach(tile => tile.Reset());
@@ -253,6 +265,11 @@ public class FinderAstar : IPathFinder
         }
 
         _path.Reverse();
+
+        if (_tempObstacleIndex != InvalidTileIndex)
+        {
+            SetObstacle(_tempObstacleIndex, false);
+        }
 
         return true;
     }

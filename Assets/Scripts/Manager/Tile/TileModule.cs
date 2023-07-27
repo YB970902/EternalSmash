@@ -5,6 +5,7 @@ using Battle;
 using FixMath.NET;
 using UnityEngine;
 using System.Linq.Expressions;
+using Character;
 
 public interface IPathFinder
 {
@@ -27,7 +28,7 @@ public interface IPathFinder
     /// <summary>
     /// 경로 탐색 성공 여부를 반환하고, 경로는 매개변수를 통해 반환한다.
     /// </summary>
-    public bool FindPath(List<int> _path, int _startIndex, int _destIndex);
+    public bool FindPath(List<int> _path, int _startIndex, int _destIndex, int _tempObstacleIndex);
 
     /// <summary>
     /// 목표 인덱스의 주변에서 시작 인덱스와 가장 가까운 열린 노드를 반환한다.
@@ -62,22 +63,29 @@ public class TileModule
         public int StartIndex { get; private set; }
         public int DestIndex { get; private set; }
         public System.Action OnPathFindEnd { get; private set; }
+        public int TempObstacleIndex { get; private set; }
         
         /// <summary>
         /// 값을 세팅한다.
         /// </summary>
-        public void Set(PathGuide _guide, List<int> _path, int _startIndex, int _destIndex, System.Action _onPathFindEnd)
+        public void Set(PathGuide _guide, List<int> _path, int _startIndex, int _destIndex, System.Action _onPathFindEnd, int _tempObstacleIndex)
         {
             Guide = _guide;
             Path = _path;
             StartIndex = _startIndex;
             DestIndex = _destIndex;
             OnPathFindEnd = _onPathFindEnd;
+            TempObstacleIndex = _tempObstacleIndex;
         }
 
         public void UpdateDestIndex(int _destIndex)
         {
             DestIndex = _destIndex;
+        }
+
+        public void UpdateTempObstacleIndex(int _tempObstacleIndex)
+        {
+            TempObstacleIndex = _tempObstacleIndex;
         }
     }
     
@@ -119,7 +127,7 @@ public class TileModule
         var requestObj = pathFindRequests.First.Value;
         pathFindRequests.RemoveFirst();
 
-        pathFinder.FindPath(requestObj.Path, requestObj.StartIndex, requestObj.DestIndex);
+        pathFinder.FindPath(requestObj.Path, requestObj.StartIndex, requestObj.DestIndex, requestObj.TempObstacleIndex);
         requestObj.OnPathFindEnd();
         pathFindRequestPool.Push(requestObj);
     }
@@ -127,13 +135,10 @@ public class TileModule
     /// <summary>
     /// 길찾기를 요청한다. pathGuide는 pool에 들어가며, 매 프레임마다 조금씩 길찾기를 수행한다. 
     /// </summary>
-    /// <param name="_pathGuide">길찾기를 수행할 PathGuide</param>
-    /// <param name="_startIndex">출발지 인덱스</param>
-    /// <param name="_destIndex">목적지 인덱스</param>
-    public void RequestPathFind(PathGuide _guide, List<int> _path, int _startIndex, int _destIndex, System.Action _onPathFindEnd)
+    public void RequestPathFind(PathGuide _guide, List<int> _path, int _startIndex, int _destIndex, System.Action _onPathFindEnd, int _tempObstacleIndex)
     {
         var requestObj = pathFindRequestPool.Pull();
-        requestObj.Set(_guide, _path, _startIndex, _destIndex, _onPathFindEnd);
+        requestObj.Set(_guide, _path, _startIndex, _destIndex, _onPathFindEnd, _tempObstacleIndex);
         pathFindRequests.AddLast(requestObj);
     }
 
@@ -150,10 +155,11 @@ public class TileModule
     /// <summary>
     /// 목적지 타일의 인덱스를 갱신한다.
     /// </summary>
-    public void UpdateDestIndex(PathGuide _guide, int _destIndex)
+    public void UpdateDestIndex(PathGuide _guide, int _destIndex, int _tempObstacleIndex)
     {
         var requestObj = pathFindRequests.First(_ => _.Guide == _guide);
         requestObj.UpdateDestIndex(_destIndex);
+        requestObj.UpdateTempObstacleIndex(_tempObstacleIndex);
     }
     
     /// <summary>
@@ -226,7 +232,7 @@ public class TileModule
     public List<int> FindPathImmediately(int _startIndex, int _destIndex)
     {
         List<int> path = new List<int>(TileModule.TotalCount);
-        pathFinder.FindPath(path, _startIndex, _destIndex);
+        pathFinder.FindPath(path, _startIndex, _destIndex, Define.Tile.InvalidTileIndex);
         return path;
     }
     
