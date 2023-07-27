@@ -606,6 +606,8 @@ public class FinderJPS : IPathFinder
         // 목표 지점이 장애물이 아니면, 그대로 반환한다.
         if (nodeList[_targetIndex].IsObstacle == false) return _targetIndex;
 
+        // 시작지점
+        (int startX, int startY) = TileModule.IndexToPos(_startIndex);
         // 목표지점
         (int targetX, int targetY) = TileModule.IndexToPos(_targetIndex);
         
@@ -642,7 +644,7 @@ public class FinderJPS : IPathFinder
                     if (IsObstacle(x, y) == false)
                     {
                         isFindOpenNode = true;
-                        int h = Node.CalcH(x, y, targetX, targetY);
+                        int h = Node.CalcH(x, y, startX, startY);
                         if (h < minH)
                         {
                             minH = h;
