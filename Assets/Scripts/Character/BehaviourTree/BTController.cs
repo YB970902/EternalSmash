@@ -30,8 +30,11 @@ public class BTController
     /// </summary>
     public void Init(GameObject _obj, int _startIndex)
     {
+        var movementController = _obj.GetComponent<MovementController>();
         PathGuide = new PathGuide();
-        PathGuide.Init(_obj.GetComponent<MovementController>(), _startIndex);
+        
+        movementController.Init();
+        PathGuide.Init(movementController, _startIndex);
 
         BlackBoard = new BTBlackBoard();
     }

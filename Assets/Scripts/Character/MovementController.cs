@@ -10,9 +10,7 @@ using UnityEngine.UIElements;
 namespace Character
 {
     /// <summary>
-    /// 이동을 관리하는 스크립트. TileManager에 의존적이다.
-    /// 외부에서 index를 입력받으면 TileManager를 통해 이동할 경로를 알아낸다.
-    /// 직접 이동할 곳을 찾거나 하진 않고 외부에서 입력받도록 설계되었다.
+    /// 
     /// </summary>
     public class MovementController : MonoBehaviour
     {
@@ -29,6 +27,11 @@ namespace Character
         /// <summary> 이동해야할 목표 위치 </summary>
         private FixVector2 targetPosition;
 
+        /// <summary> 이동을 시작한 위치의 인덱스 </summary>
+        private int startIndex;
+        /// <summary> 이해야할 목표 위치의 인덱스 </summary>
+        private int targetIndex;
+
         /// <summary> 지금까지 카운트된 틱 </summary>
         private int curCountTick;
 
@@ -37,41 +40,50 @@ namespace Character
             position = FixVector2.Zero;
             startPosition = FixVector2.Zero;
             targetPosition = FixVector2.Zero;
+            startIndex = Define.Tile.InvalidTileIndex;
+            targetIndex = Define.Tile.InvalidTileIndex;
             curCountTick = 0;
             IsMove = false;
         }
-
+        
         /// <summary>
-        /// 위치를 이동시킨다
+        /// 해당 인덱스로 위치를 이동시킨다.
+        /// 캐릭터가 생성되고나서 1회만 호출된다.
         /// </summary>
-        public void SetPosition(FixVector2 pos)
-        {
-            position = pos;
-            transform.position = new Vector2((float)pos.x, (float)pos.y);
-        }
-
-        /// <summary>
-        /// 다음으로 이동해야 할 타일을 지정한다.
-        /// </summary>
-        public void SetNextTile(int _index)
-        {
-            startPosition = position;
-            targetPosition = BattleManager.Instance.Tile.GetTilePosition(_index);
-            IsMove = true;
-        }
-
-        /// <summary>
-        /// 위치를 이동시킨다.
-        /// </summary>
-        public void SetPosition(int _index)
+        public void SetStartPosition(int _index)
         {
             SetPosition(BattleManager.Instance.Tile.GetTilePosition(_index));
             startPosition = position;
             targetPosition = position;
+            
+            startIndex = _index;
+            SetOccupied(startIndex, true);
         }
 
         /// <summary>
-        /// 이동하도록 업데이트하는 함수.
+        /// 해당 포지션으로 위치를 이동시킨다
+        /// </summary>
+        private void SetPosition(FixVector2 _pos)
+        {
+            position = _pos;
+            transform.position = new Vector2((float)_pos.x, (float)_pos.y);
+        }
+
+        /// <summary>
+        /// 이동을 시작한다. 다음으로 이동할 타일의 인덱스를 받는다. 
+        /// </summary>
+        public void MoveStart(int _index)
+        {
+            startPosition = position;
+            targetPosition = BattleManager.Instance.Tile.GetTilePosition(_index);
+            IsMove = true;
+            
+            targetIndex = _index;
+            SetOccupied(targetIndex, true);
+        }
+
+        /// <summary>
+        /// 이동하도록 업데이트하는 함수. MoveStart가 먼저 호출되어야 한다.
         /// 다음 타일로 이동에 성공하면 True를 반환한다.
         /// </summary>
         public bool Tick()
@@ -86,10 +98,23 @@ namespace Character
                 IsMove = false;
                 curCountTick = 0;
                 SetPosition(targetPosition);
+
+                SetOccupied(startIndex, false);
+                startIndex = targetIndex;
                 return true;
             }
 
             return false;
+        }
+        
+        /// <summary>
+        /// 해당 타일의 점유 설정을 한다.
+        /// </summary>
+        private void SetOccupied(int _index, bool _isOccupied)
+        {
+            if (_index == Define.Tile.InvalidTileIndex) return;
+
+            BattleManager.Instance.Tile.SetOccupied(_index, _isOccupied);
         }
     }
 }
