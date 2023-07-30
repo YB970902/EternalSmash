@@ -16,10 +16,15 @@ namespace Character
     {
         /// <summary> 타일을 하나 건너는데 드는 틱 </summary>
         [SerializeField] private int moveSpeed = 100;
+        [SerializeField] private int boostSpeed = 10;
+
+        private int moveSpeed;
         
         /// <summary> 현재 이동중인지 여부. </summary>
         public bool IsMove { get; private set; }
-
+        /// <summary> 현재 빠르게 이동중인지 여부 </summary>
+        private bool isBoost;
+        
         /// <summary> 현재 위치 </summary>
         public FixVector2 position;
         /// <summary> 이동을 시작한 위치 </summary>
@@ -33,7 +38,9 @@ namespace Character
         private int targetIndex;
 
         /// <summary> 지금까지 카운트된 틱 </summary>
-        private int curCountTick;
+        private int currentCountTick;
+        /// <summary> 최대 카운트 틱 </summary>
+        private int maxCountTick;
 
         public void Init()
         {
@@ -43,7 +50,9 @@ namespace Character
             startIndex = Define.Tile.InvalidTileIndex;
             targetIndex = Define.Tile.InvalidTileIndex;
             curCountTick = 0;
+            currentCountTick = 0;
             IsMove = false;
+            isBoost = false;
         }
         
         /// <summary>
@@ -72,11 +81,13 @@ namespace Character
         /// <summary>
         /// 이동을 시작한다. 다음으로 이동할 타일의 인덱스를 받는다. 
         /// </summary>
-        public void MoveStart(int _index)
+        public void MoveStart(int _index, bool _isBoost = false)
         {
             startPosition = position;
             targetPosition = BattleManager.Instance.Tile.GetTilePosition(_index);
             IsMove = true;
+            isBoost = _isBoost;
+            maxCountTick = isBoost ? boostSpeed : moveSpeed;
             
             targetIndex = _index;
             SetOccupied(targetIndex, true);
@@ -90,17 +101,23 @@ namespace Character
         {
             if (IsMove == false) return false;
             
-            ++curCountTick;
-            Fix64 t = (Fix64)curCountTick / (Fix64)moveSpeed;
+            ++currentCountTick;
+            Fix64 t = (Fix64)currentCountTick / (Fix64)maxCountTick;
             SetPosition(FixVector2.Lerp(startPosition, targetPosition, t));
-            if (curCountTick >= moveSpeed)
+            if (currentCountTick >= maxCountTick)
             {
                 IsMove = false;
-                curCountTick = 0;
+                currentCountTick = 0;
                 SetPosition(targetPosition);
 
                 SetOccupied(startIndex, false);
                 startIndex = targetIndex;
+                if (isBoost)
+                {
+                    
+                    isBoost = false;
+                }
+
                 return true;
             }
 

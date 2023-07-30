@@ -20,6 +20,8 @@ public class PathFindTest : MonoBehaviour
     
     void Start()
     {
+        Random.InitState(100);
+        
         for(int y = 0; y < TileModule.HeightCount; ++y)
         {
             for(int x = 0; x < TileModule.WidthCount; ++x)

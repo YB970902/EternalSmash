@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Battle;
 using Define;
+using UnityEngine;
 
 namespace Character
 {
@@ -15,28 +16,27 @@ namespace Character
     {
         /// <summary> 이동을 시작하는 타일의 인덱스 </summary>
         private int startIndex;
-
         /// <summary> 도착해야하는 타일의 인덱스 </summary>
         private int targetIndex;
-
-        /// <summary> 이동해야 하는 경로 </summary>
-        private List<int> path = new List<int>(TileModule.TotalCount);
-
         /// <summary> 현재 경로의 인덱스 </summary>
         private int curPathIndex;
 
+        /// <summary> 이동해야 하는 경로 </summary>
+        private List<int> path = new List<int>(TileModule.TotalCount);
+        
         /// <summary> 이동할 오브젝트의 이동 관리자 </summary>
         private MovementController controller;
-
+        private TileModule tileModule;
+        
         /// <summary> 대기하고 있었던 횟수 </summary>
         private int currentWaitCount;
 
         /// <summary> 다음 경로에 다른 유닛이 있어서 대기하고 있는지 여부 </summary>
         private bool isWaitMove;
-
+        /// <summary> 다음 경로까지 일시적으로 빠르게 이동할것인지 여부 </summary>
+        private bool isBoost;
         /// <summary> 경로를 받기 위해 대기중인지 여부 </summary>
         public bool IsWaitPath { get; private set; }
-
         /// <summary> 경로가 비어있는지 여부 </summary>
         private bool IsPathEmpty => path.Count == 0;
 
@@ -54,6 +54,7 @@ namespace Character
             isWaitMove = false;
             IsWaitPath = false;
 
+            tileModule = BattleManager.Instance.Tile;
             controller = _controller;
             SetStartIndex(_startIndex);
         }
@@ -69,7 +70,7 @@ namespace Character
             // 경로를 받기 위해 대기중인 경우 길찾기를 취소한다.
             if (IsWaitPath)
             {
-                BattleManager.Instance.Tile.CancelPathFind(this);
+                tileModule.CancelPathFind(this);
                 IsWaitPath = false;
             }
         }
@@ -84,19 +85,27 @@ namespace Character
 
             if (isWaitMove) // 다음 경로를 다른 유닛이 점유한 경우
             {
-                if (IsOccupied(GetPath())) // 여전히 점유중인 경우
+                if (IsNextPathOccupied()) // 여전히 점유중인 경우
                 {
                     // WaitMoveCount만큼 대기하다가 계속 점유중이면 새로운 경로를 찾는다.
                     ++currentWaitCount;
                     if (currentWaitCount < Define.Tile.WaitMoveCount) return BehaviourTree.BTState.Running;
-                    currentWaitCount = 0;
-                    SetTargetIndex(targetIndex, GetPath());
+                    if (Random.Range(0, 2) == 0)
+                    {
+                        // 다시 기다린다
+                        currentWaitCount = 0;
+                    }
+                    else
+                    {
+                        // 빠르게 다음 목적지로 이동한다.
+                        SetTargetIndex(targetIndex, GetPath());
+                        isBoost = true;
+                    }
                     return BehaviourTree.BTState.Running;
                 }
 
                 // 다시 이동을 시작한다.
                 isWaitMove = false;
-                currentWaitCount = 0;
                 controller.MoveStart(GetPath());
             }
 
@@ -111,7 +120,7 @@ namespace Character
 
             if (path.Count <= curPathIndex) return BehaviourTree.BTState.Fail; // 최종 목적지에 도착하면 Fail을 반환한다.
 
-            if (IsOccupied(GetPath())) // 다음 노드가 점유하고 있을경우
+            if (IsNextPathOccupied()) // 다음 노드가 점유하고 있을경우
             {
                 // 다음 노드의 점유가 풀릴때까지 대기한다.
                 isWaitMove = true;
@@ -139,20 +148,21 @@ namespace Character
         /// </summary>
         public void SetTargetIndex(int _index, int _tempObstacleIndex = Tile.InvalidTileIndex)
         {
-            targetIndex = BattleManager.Instance.Tile.GetNearOpenNode(startIndex, _index);
+            targetIndex = tileModule.GetNearOpenNode(startIndex, _index);
 
             if (IsWaitPath)
             {
                 // 이미 경로를 받기위해 대기중이라면 목적지를 갱신한다. 
-                BattleManager.Instance.Tile.UpdateDestIndex(this, targetIndex, _tempObstacleIndex);
+                tileModule.UpdateDestIndex(this, targetIndex, _tempObstacleIndex);
                 return;
             }
 
             // 길찾기 요청을 보낸다.
-            BattleManager.Instance.Tile.RequestPathFind(this, path, startIndex, targetIndex, OnFindPath, _tempObstacleIndex);
+            tileModule.RequestPathFind(this, path, startIndex, targetIndex, OnFindPath, _tempObstacleIndex);
 
             // 경로를 기다린다.
             IsWaitPath = true;
+            isBoost = false;
         }
 
         /// <summary>
@@ -171,13 +181,14 @@ namespace Character
             curPathIndex = 0;
             if (IsPathEmpty == false)
             {
-                if (IsOccupied(GetPath()))
+                if (IsNextPathOccupied())
                 {
                     isWaitMove = true;
                 }
                 else
                 {
-                    controller.MoveStart(GetPath());
+                    controller.MoveStart(GetPath(), isBoost);
+                    isBoost = false;
                 }
             }
         }
@@ -191,8 +202,25 @@ namespace Character
         private bool IsOccupied(int _index)
         {
             if (_index == Define.Tile.InvalidTileIndex) return true;
+            
+            return tileModule.IsOccupied(_index);
+        }
 
-            return BattleManager.Instance.Tile.IsOccupied(_index);
+        private bool IsNextPathOccupied()
+        {
+            return IsOccupied(GetPath());
+            var nextPath = GetPath();
+            (int startX, int startY) = TileModule.IndexToPos(startIndex);
+            (int targetX, int targetY) = TileModule.IndexToPos(nextPath);
+
+            if (startX == targetX || startY == targetY) // 가로 세로 이동일경우
+            {
+                return IsOccupied(nextPath);
+            }
+            
+            return IsOccupied(nextPath) ||
+                   IsOccupied(TileModule.PosToIndex(startX, targetY)) ||
+                   IsOccupied(TileModule.PosToIndex(targetX, startY));
         }
     }
 }
