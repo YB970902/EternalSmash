@@ -1,0 +1,8 @@
+.panel-title {
+    background-color: rgba(28, 28, 28, 255);
+    height: 20px;
+    padding-left: 10px;
+    padding-right: 0;
+    padding-top: 2px;
+    padding-bottom: 0;
+}
