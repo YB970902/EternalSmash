@@ -15,10 +15,8 @@ namespace Character
     public class MovementController : MonoBehaviour
     {
         /// <summary> 타일을 하나 건너는데 드는 틱 </summary>
-        [SerializeField] private int moveSpeed = 100;
+        [SerializeField] private int curCountTick = 100;
         [SerializeField] private int boostSpeed = 10;
-
-        private int moveSpeed;
         
         /// <summary> 현재 이동중인지 여부. </summary>
         public bool IsMove { get; private set; }
@@ -87,7 +85,7 @@ namespace Character
             targetPosition = BattleManager.Instance.Tile.GetTilePosition(_index);
             IsMove = true;
             isBoost = _isBoost;
-            maxCountTick = isBoost ? boostSpeed : moveSpeed;
+            maxCountTick = isBoost ? boostSpeed : curCountTick;
             
             targetIndex = _index;
             SetOccupied(targetIndex, true);
