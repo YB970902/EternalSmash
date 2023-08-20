@@ -132,8 +132,8 @@ public class BTBuilder
         return nodeBases.Find(_ => _.Data.ID == _id);
     }
     
-    public System.Func<bool> GetFunction(string _funcName)
+    public System.Func<bool> GetFunction(Define.BehaviourTree.BTConditional _btConditionalFunc)
     {
-        return controller.GetConditionalFunc(_funcName);
+        return controller.GetConditionalFunc(_btConditionalFunc);
     }
 }

@@ -10,55 +10,75 @@ namespace Editor.BT
 {
     public class BTEditorNode : Node
     {
-        /// <summary> 노드의 이름. 어떤 노드인지 구분하기 위해 존재한다. </summary>
-        private string nodeName;
+        /// <summary>
+        /// 노드 종류의 이름
+        /// </summary>
+        protected string nodeTypeName;
 
-        public BTEditorNode()
+        protected VisualElement inputPort { get; private set; }
+        protected VisualElement outputPort { get; private set; }
+        protected VisualElement extension { get; private set; }
+
+        protected Label nodeNameLabel { get; private set; }
+
+        public BTEditorNode() : base("Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorNode.uxml")
         {
-            nodeName = "EditorNode";
-
-            Init();
+            inputPort = this.Q<VisualElement>("input-port");
+            outputPort = this.Q<VisualElement>("output-port");
+            extension = this.Q<VisualElement>("extension-content");
+            nodeNameLabel = this.Q<Label>("node-name");
         }
         
-        private void Init()
+        public virtual void Init(Vector2 _position, Define.BehaviourTree.BTNodeType _nodeType)
         {
-            var nodeStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorNode.uss");
-            styleSheets.Add(nodeStyleSheet);
+            nodeTypeName = $"{_nodeType.ToString()}Node";
             
-            mainContainer.AddToClassList("--bt-node-background");
-            
-            // 사용하지 않는 컨테이너 제거
-            titleButtonContainer.RemoveFromHierarchy();
-            inputContainer.RemoveFromHierarchy();
-            outputContainer.RemoveFromHierarchy();
-            
-            // 부모노드 Port 추가
-            var parentPort = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
-            parentPort.portName = "ParentNode";
-            parentPort.AddToClassList("--bt-node-port");
-            mainContainer.Insert(0, parentPort);
+            SetPosition(new Rect(_position, Vector2.zero));
+        }
+        
+        public void Draw()
+        {
+            nodeNameLabel.text = nodeTypeName;
 
-            // 노드의 별명 필드 추가
-            var nodeNickNameField = new TextField()
-            {
-                value = nodeName,
-                bindingPath = nodeName.GetType().Name
-            };
-            nodeNickNameField.AddToClassList("--bt-node-input-field");
+            OnDraw();
+        }
+
+        protected Port CreateInputPort()
+        {
+            var port = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
+            port.portName = string.Empty;
+            port.Q<Label>("type").style.marginLeft = 0;
+            port.Q<Label>("type").style.marginRight = 0;
+            return port;
+        }
+        
+        public Port CreateOutputPort()
+        {
+            var port = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
+            port.portName = string.Empty;
+            port.Q<Label>("type").style.marginLeft = 0;
+            port.Q<Label>("type").style.marginRight = 0;
+            return port;
+        }
+
+        protected VisualElement LoadVisualElement(string _path)
+        {
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(_path).Instantiate();
+            extension.Add(visualTree);
+            return visualTree;
+        }
+
+        protected void AddToExtension(VisualElement _element)
+        {
+            extension.Add(_element);
+        }
+
+        /// <summary>
+        /// 노드가 생성되고 그려질때 호출될 함수.
+        /// </summary>
+        protected virtual void OnDraw()
+        {
             
-            titleContainer.Insert(0, nodeNickNameField);
-            
-            // 노드의 이름 라벨 추가
-            var nodeNameLabel = new Label()
-            {
-                text = "BTEditorNode",
-            };
-            nodeNameLabel.AddToClassList("--bt-node-name");
-            
-            extensionContainer.Add(nodeNameLabel);
-            extensionContainer.AddToClassList("--bt-node-extension-background");
-            
-            RefreshExpandedState();
         }
     }
 }

@@ -51,10 +51,34 @@ namespace Define
             CheckRunning = 1 << 2,
         }
 
-        public static class Conditional
+        public enum BTNodeType
         {
-            public const string True = "True";
-            public const string False = "False";
+            Root,
+            Control,
+            Execute,
+        }
+
+        public enum BTControlNodeType
+        {
+            None,
+            Sequence,
+            Selector,
+            If,
+            While,
+        }
+
+        public enum BTConditional
+        {
+            None,
+            True,
+            False,
+            End,
+        }
+
+        public enum BTExecute
+        {
+            None,
+            End,
         }
     }
 }

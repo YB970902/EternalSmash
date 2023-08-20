@@ -96,13 +96,13 @@ public class BTIfData : BTData
     
     public System.Func<bool> ConditionalFunc { get; private set; }
 
-    public static BTIfData Create(BTBuilder _builder, int _id, int _trueNodeId, int _falseNodeId, string _funcName)
+    public static BTIfData Create(BTBuilder _builder, int _id, int _trueNodeId, int _falseNodeId, Define.BehaviourTree.BTConditional _btConditionalFunc)
     {
         var result = new BTIfData();
         result.ID = _id;
         result.nodeSetSequence += () => { result.TrueNode = _builder.GetNode(_trueNodeId); };
         result.nodeSetSequence += () => { result.FalseNode = _builder.GetNode(_falseNodeId); };
-        result.ConditionalFunc = _builder.GetFunction(_funcName);
+        result.ConditionalFunc = _builder.GetFunction(_btConditionalFunc);
         return result;
     }
 }

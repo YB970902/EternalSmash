@@ -1,34 +1,68 @@
-.--bt-node-port {
-    background-color: dimgray;
+VisualElement {
+    font-size: 14px;
+}
+
+#input-port {
+    align-items: center;
+    justify-content: flex-end;
+}
+
+#output-port {
+    align-items: center;
+    justify-content: center;
+}
+
+.--bt-node-main {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-left-width: 10px;
+    border-right-width: 10px;
+    border-top-width: 10px;
+    border-bottom-width: 10px;
+    width: auto;
+    min-width: auto;
+    max-width: none;
+}
+
+.--bt-node-background {
+    background-color: rgb(33, 35, 37);
+}
+
+.--bt-node-input-field {
+    border-radius: 4px;
+    max-width: 240px;
+    min-width: 160px;
+    padding: 8px;
+    -unity-text-align: upper-left;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    min-height: 30px;
+    align-items: center;
+    background-color: rgba(91, 91, 91, 255);
 }
 
 .--bt-node-input-field > .unity-text-field__input {
     background-color: transparent;
     border-color: transparent;
-    border-radius: 4px;
-    max-width: 240px;
     min-width: 160px;
-    padding: 8px;
+    min-height: 30px;
+    max-width: 240px;
+    padding-left: 8px;
 }
 
 .--bt-node-input-field > .unity-text-field__input:focus {
-    background-color: #1D1D1E;
-    border-color: #27292C;
-    border-radius: 4px;
-    max-width: 240px;
+    background-color: rgb(29, 29, 30);
+    border-color: rgb(39, 41, 44);
     min-width: 160px;
-    padding: 8px;
+    min-height: 30px;
+    max-width: 240px;
+    padding-left: 8px;
 }
 
-.--bt-node-name {
-    font-size: 14px;
-}
-
-.--bt-node-background {
-    background-color: gray;
-}
-
-.--bt-node-extension-background {
-    background-color: #212325;
-    padding: 8px;
+.--bt-node-padding {
+    padding-left: 8px;
 }

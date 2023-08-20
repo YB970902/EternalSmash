@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/BehaviourTree/BehaviourTreeNode/ControlNode/BTEditorIfNode.uss?fileID=7433441132597879392&amp;guid=93702a794ac2a4a948b609ce82e3cf08&amp;type=3#BTEditorIfNode" />
+    <ui:DropdownField label="FunctionName" index="-1" name="conditonal-dropdown" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+    <ui:VisualElement name="port-container" class="--if-node-port-container">
+        <ui:VisualElement name="true-node" class="--if-node-port">
+            <ui:Label text="TrueNode" display-tooltip-when-elided="true" />
+        </ui:VisualElement>
+        <ui:VisualElement name="false-node" class="--if-node-port">
+            <ui:Label text="FalseNode" display-tooltip-when-elided="true" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

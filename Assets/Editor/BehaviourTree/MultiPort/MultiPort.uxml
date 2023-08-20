@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/BehaviourTree/MultiPort/MultiPort.uss?fileID=7433441132597879392&amp;guid=3afd2ee993224496c86d68982856205e&amp;type=3#MultiPort" />
+    <ui:VisualElement name="output-port" class="--multi-port" />
+    <ui:Button text="-" display-tooltip-when-elided="true" name="btn-remove" class="btn-remove --multi-port-btn-remove" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+</ui:UXML>

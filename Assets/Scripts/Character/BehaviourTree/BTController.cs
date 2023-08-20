@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Character;
@@ -57,12 +58,13 @@ public class BTController
     /// <summary>
     /// 함수의 이름을 받으면 그 이름에 맞는 함수를 반환한다.
     /// </summary>
-    public System.Func<bool> GetConditionalFunc(string _funcName)
+    public Func<bool> GetConditionalFunc(BTConditional _btConditionalFunc)
     {
-        switch (_funcName)
+        switch (_btConditionalFunc)
         {
-            case Conditional.True: return True;
-            case Conditional.False: return False;
+            case BTConditional.None: return null;
+            case BTConditional.True: return True;
+            case BTConditional.False: return False;
         }
 
         return null;

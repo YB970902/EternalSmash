@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorNode.uss?fileID=7433441132597879392&amp;guid=da8a8589d46f14b429fe9c4b04968682&amp;type=3#BTEditorNode" />
+    <ui:VisualElement name="control-node">
+        <ui:DropdownField label="ChoiceType" index="0" name="control-dropdown" choices="None" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+        <ui:VisualElement name="control-data" />
+    </ui:VisualElement>
+</ui:UXML>
