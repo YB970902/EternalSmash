@@ -72,12 +72,18 @@ namespace Define
             None,
             True,
             False,
+            HasTarget,
+            IsArrived,
             End,
         }
 
         public enum BTExecute
         {
             None,
+            FollowTarget,
+            MoveToTarget,
+            Move,
+            Idle,
             End,
         }
     }

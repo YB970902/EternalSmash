@@ -17,6 +17,8 @@ namespace Editor.BT
         private Define.BehaviourTree.BTExecute exeucteTag;
         protected override void OnDraw()
         {
+            IsWarning = true;
+            
             LoadVisualElement("Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorExecuteNode.uxml");
             inputPort.Add(CreateInputPort());
 
@@ -33,6 +35,7 @@ namespace Editor.BT
         {
             if (Enum.TryParse<Define.BehaviourTree.BTExecute>(_evt.newValue, out var tag) == false) return;
 
+            IsWarning = tag == BehaviourTree.BTExecute.None;
             exeucteTag = tag;
         }
     }

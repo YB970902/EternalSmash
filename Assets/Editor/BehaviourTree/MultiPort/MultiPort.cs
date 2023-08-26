@@ -11,6 +11,8 @@ namespace Editor.Util
     {
         private MultiPortController controller;
         
+        public Port Port { get; private set; }
+        
         public MultiPort()
         {
             var multiPortUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/BehaviourTree/MultiPort/MultiPort.uxml");
@@ -21,12 +23,19 @@ namespace Editor.Util
 
         public void Init(MultiPortController _controller, Port _port)
         {
-            var portContainer = this.Q<VisualElement>("output-port");
+            Port = _port;
             controller = _controller;
+            
+            var portContainer = this.Q<VisualElement>("output-port");
             portContainer.Add(_port);
         }
 
         private void OnClickRemove(ClickEvent _evt)
+        {
+            Remove();
+        }
+
+        public void Remove()
         {
             controller.OnPortRemoved(this);
             RemoveFromHierarchy();

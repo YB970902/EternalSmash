@@ -21,6 +21,8 @@ namespace Editor.BT
         
         protected override void OnDraw()
         {
+            IsWarning = true;
+            
             controlContainer = LoadVisualElement("Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorControlNode.uxml");
             controlData = controlContainer.Q<VisualElement>("control-data");
 
@@ -45,10 +47,12 @@ namespace Editor.BT
         private void OnChangeChoiceType(Define.BehaviourTree.BTControlNodeType _type)
         {
             controlData.Clear();
-
+            IsWarning = _type == BehaviourTree.BTControlNodeType.None;
+            
             if (_type == BehaviourTree.BTControlNodeType.None)
             {
                 nodeNameLabel.text = nodeTypeName;
+                onPortRemoved = null;
                 return;
             }
 

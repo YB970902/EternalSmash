@@ -1,12 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorNode.uss?fileID=7433441132597879392&amp;guid=da8a8589d46f14b429fe9c4b04968682&amp;type=3#BTEditorNode" />
-    <ui:VisualElement name="node-main" class="--bt-node-main --bt-node-background">
-        <ui:VisualElement name="input-port" class="--bt-node-background" />
-        <ui:VisualElement name="content" class="--bt-node-background">
+    <ui:VisualElement name="node-main" class="--bt-node-main">
+        <ui:VisualElement name="input" />
+        <ui:VisualElement name="output" />
+        <ui:VisualElement name="input-port" />
+        <ui:VisualElement name="content">
             <ui:TextField picking-mode="Ignore" name="node-nickname" text="Node" class="--bt-node-input-field" />
             <ui:Label text="Label" display-tooltip-when-elided="true" name="node-name" class="--bt-node-padding" style="padding-right: 0; padding-left: 9px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="extension-content" class="--bt-node-background --bt-node-padding" />
-        <ui:VisualElement name="output-port" class="--bt-node-background" />
+        <ui:VisualElement name="extension-content" class="--bt-node-padding" />
+        <ui:VisualElement name="output-port" />
     </ui:VisualElement>
 </ui:UXML>

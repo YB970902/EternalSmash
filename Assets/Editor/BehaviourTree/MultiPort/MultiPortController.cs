@@ -25,6 +25,7 @@ namespace Editor.Util
         public void Init(BTEditorNode _node)
         {
             node = _node;
+            node.onPortRemoved = OnPortRemoved;
         }
 
         private void OnClickAddButton(ClickEvent _evt)
@@ -38,6 +39,16 @@ namespace Editor.Util
         public void OnPortRemoved(MultiPort _port)
         {
             portList.Remove(_port);
+            node.RemoveOutputPort(_port.Port);
+        }
+
+        private void OnPortRemoved(UnityEditor.Experimental.GraphView.Port _port)
+        {
+            var multiPort = portList.Find(_ => _.Port == _port);
+            
+            if (multiPort == null) return;
+
+            multiPort.Remove();
         }
     }
 }
