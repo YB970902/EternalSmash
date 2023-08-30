@@ -4,136 +4,70 @@ using UnityEngine;
 
 /// <summary>
 /// BehaviourTree를 생성해주는 빌더.
-/// 빌더를 하나만 인스턴스 해놓으면 여러종류의 BehaviourTree를 만들 수 있다.
 /// </summary>
 public class BTBuilder
 {
     private List<BTNodeBase> nodeBases;
     private List<BTData> nodeDatas;
 
-    /// <summary> 결과로 반환할 컨트롤러 </summary>
-    private BTController controller;
+    public BTController Controller { get; private set; }
+    public BTCaller Caller { get; private set; }
+
+    private static BTBuilder instance;
+
+    public static BTBuilder Instance => instance ??= instance = new BTBuilder();
     
-    public BTBuilder()
+    private BTBuilder()
     {
         nodeBases = new List<BTNodeBase>();
         nodeDatas = new List<BTData>();
-        controller = null;
+        Controller = null;
+        Caller = null;
     }
-
+    
     /// <summary>
-    /// 모든 데이터를 지운다.
+    /// 빌더를 세팅한다.
     /// </summary>
-    public void Clear()
+    public void Set(BTCaller _btCaller)
     {
         nodeBases.Clear();
         nodeDatas.Clear();
-        controller = null;
+        Controller = null;
+        Caller = _btCaller;
     }
     
     /// <summary>
-    /// 입력된 데이터를 기반으로 노드를 만든 후에
+    /// 입력된 데이터를 기반으로 노드를 만든 후에 Controller를 반환한다.
     /// </summary>
-    /// <returns></returns>
     public BTController Build()
     {
-        nodeDatas.ForEach(_ => _.SetValue());
-        
-        return controller;
+        foreach (var data in nodeDatas)
+        {
+            nodeBases.Add(data.GetNodeInstance());
+        }
+
+        for (int i = 0, count = nodeDatas.Count; i < count; ++i)
+        {
+            nodeBases[i].Init(this, nodeDatas[i]);
+        }
+
+        return Controller;
     }
 
     /// <summary>
-    /// 루트 노드 생성. BTBuilder에서 가장 먼저 호출되어야 하는 함수이다.
+    /// 노드의 데이터를 추가한다.
     /// </summary>
-    public BTBuilder AddRootNode(BTRootData _data)
+    public BTBuilder AddNodeData(BTData _data)
     {
-        var node = new BTRoot();
-        // Root는 트리에서 단 한번만 호출되기 때문에, 여기에서 컨트롤러를 만든다.
-        controller = new BTController(node);
-        node.Init(null, controller, _data);
-
-        AddNodeAndData(node, _data);
-        
-        return this;
-    }
-
-    public BTBuilder AddSelectorNode(BTCaller _caller, BTSelectorData _data, int _parentId)
-    {
-        var parentNode = GetNode(_parentId);
-        
-        var node = new BTSelector();
-        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
-        node.Init(_caller, controller, _data);
-
-        AddNodeAndData(node, _data);
-        
-        return this;
-    }
-    
-    public BTBuilder AddSequenceNode(BTCaller _caller, BTSequenceData _data, int _parentId)
-    {
-        var parentNode = GetNode(_parentId);
-        
-        var node = new BTSequence();
-        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
-        node.Init(_caller, controller, _data);
-
-        AddNodeAndData(node, _data);
-        
-        return this;
-    }
-
-    public BTBuilder AddIfNode(BTCaller _caller, BTIfData _data, int _parentId)
-    {
-        var parentNode = GetNode(_parentId);
-
-        var node = new BTIf();
-        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
-        node.Init(_caller, controller, _data);
-        
-        AddNodeAndData(node, _data);
-
-        return this;
-    }
-    
-    public BTBuilder AddWhileNode(BTCaller _caller, BTWhileData _data, int _parentId)
-    {
-        var parentNode = GetNode(_parentId);
-
-        var node = new BTWhile();
-        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
-        node.Init(_caller, controller, _data);
-        
-        AddNodeAndData(node, _data);
-
-        return this;
-    }
-    
-    public BTBuilder AddExecuteNode(BTCaller _caller, BTExecuteNodeBase _node, BTExecuteData _data, int _parentId)
-    {
-        var parentNode = GetNode(_parentId);
-        
-        _caller.SetEvaluateFunction(parentNode.OnChildEvaluated, _data);
-        _node.Init(_caller, controller, _data);
-        
-        AddNodeAndData(_node, _data);
-
-        return this;
-    }
-
-    private void AddNodeAndData(BTNodeBase _node, BTData _data)
-    {
-        nodeBases.Add(_node);
         nodeDatas.Add(_data);
+        return this;
     }
     
+    /// <summary>
+    /// 아이디가 동일한 노드를 반환한다. 없으면 null을 리턴한다.
+    /// </summary>
     public BTNodeBase GetNode(int _id)
     {
-        return nodeBases.Find(_ => _.Data.ID == _id);
-    }
-    
-    public System.Func<bool> GetFunction(Define.BehaviourTree.BTConditional _btConditionalFunc)
-    {
-        return controller.GetConditionalFunc(_btConditionalFunc);
+        return nodeBases.Find(_ => _.ID == _id);
     }
 }

@@ -3,27 +3,30 @@ using System.Collections.Generic;
 using Define;
 using UnityEngine;
 
-public class BTFindPathRandomTarget : BTExecuteNodeBase
+public class BTFindPathRandomTarget : BTExecuteAction
 {
-    protected override void Init()
+    protected override void OnInit()
     {
-        
-    }
 
+    }
+    
     public override void OnEnter()
     {
-        base.OnEnter();
         btController.PathGuide.SetTargetIndex(btController.BlackBoard.RandomTargetNode);
     }
 
-    public override void Evaluate()
+    public override void OnExit()
+    {
+        
+    }
+    
+    public override BehaviourTree.BTState Evaluate()
     {
         if (btController.PathGuide.IsWaitPath == false) // 경로 탐색이 완료된경우
         {
-            btCaller.OnChildEvaluated(BehaviourTree.BTState.Success);
-            return;
+            return BehaviourTree.BTState.Success;
         }
-        
-        btCaller.OnChildEvaluated(BehaviourTree.BTState.Running);
+
+        return BehaviourTree.BTState.Running;
     }
 }

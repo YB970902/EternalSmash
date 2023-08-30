@@ -7,34 +7,36 @@ public class BTRoot : BTNodeBase
 {
     /// <summary> 자식의 OnEnter를 1회만 호출하기 위한 플래그 </summary>
     private bool isRunning;
+
+    private BTNodeBase child;
     
-    protected override void Init(BTData _data)
+    protected override void OnInit(BTBuilder _builder, BTData _data)
     {
-        if (_data is not BTRootData)
+        var data = _data as BTRootData;
+        if (data == null)
         {
             Debug.LogError("data type is not BTRootData");
             return;
         }
 
-        Data = _data;
+        child = _builder.GetNode(data.ChildID);
         isRunning = false;
     }
 
     public override void Evaluate()
     {
-        var data = (Data as BTRootData);
         if (isRunning == false)
         {
-            data.Child.OnEnter();
+            child.OnEnter();
             isRunning = true;
         }
-        data.Child.Evaluate();
+        child.Evaluate();
     }
 
     public override void OnChildEvaluated(Define.BehaviourTree.BTState _state)
     {
         isRunning = false;
-        (Data as BTRootData).Child.OnExit();
+        child.OnExit();
         // Root노드로 돌아왔다면 Running노드를 제거한다.
         btController.SetRunningNode(null);
     }

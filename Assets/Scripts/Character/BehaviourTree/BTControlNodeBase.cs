@@ -19,7 +19,7 @@ public abstract class BTControlNodeBase : BTNodeBase
     /// </summary>
     protected bool isEnterExecuteNode;
 
-    protected override void Init(BTData _data)
+    protected override void OnInit(BTBuilder _builder, BTData _data)
     {
         isEnterExecuteNode = false;
     }

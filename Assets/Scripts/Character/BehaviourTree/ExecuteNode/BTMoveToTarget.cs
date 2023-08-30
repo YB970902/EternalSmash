@@ -1,16 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Define;
 
-public class BTMoveToTarget : BTExecuteNodeBase
+public class BTMoveToTarget : BTExecuteAction
 {
-    protected override void Init()
+    protected override void OnInit()
+    {
+
+    }
+
+    public override void OnEnter()
     {
         
     }
-    
-    public override void Evaluate()
+
+    public override void OnExit()
     {
-        btCaller.OnChildEvaluated(btController.PathGuide.Tick());
+        
+    }
+
+    public override BehaviourTree.BTState Evaluate()
+    {
+        return btController.PathGuide.Tick();
     }
 }

@@ -69,7 +69,23 @@ public class BTController
 
         return null;
     }
-    
+
+    public BTExecuteAction GetExecuteAction(BTExecute _executeType)
+    {
+        switch (_executeType)
+        {
+            case BTExecute.MoveToTarget: return new BTMoveToTarget();
+            case BTExecute.BTMoveToTarget: return new BTMoveToTarget();
+            case BTExecute.BTTwoTickFail: return new BTTwoTickFail();
+            case BTExecute.BTTwoTickSuccess: return new BTTwoTickSuccess();
+            case BTExecute.BTFindPathRandomTarget: return new BTFindPathRandomTarget();
+            case BTExecute.BTSetRandomTargetIndex: return new BTSetRandomTargetIndex();
+            default: return null;
+        }
+        
+        return null;
+    }
+
     /// <summary>
     /// 현재 실행중인 노드를 설정하는 함수
     /// </summary>

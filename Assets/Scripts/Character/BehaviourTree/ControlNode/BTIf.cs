@@ -13,25 +13,31 @@ public class BTIf : BTControlNodeBase
     /// <summary> 조건 함수의 결과가 참인지 거짓인지 여부 </summary>
     private bool isTrue;
 
-    protected override void Init(BTData _data)
+    private BTNodeBase trueNode;
+    private BTNodeBase falseNode;
+    private System.Func<bool> conditionalFunc;
+
+    protected override void OnInit(BTBuilder _builder, BTData _data)
     {
-        if (_data is not BTIfData)
+        var data = _data as BTIfData;
+        if (data != null)
         {
             Debug.LogError("data type is not BTIfData");
             return;
         }
 
-        Data = _data;
+        trueNode = _builder.GetNode(data.TrueNodeID);
+        falseNode = _builder.GetNode(data.FalseNodeID);
+        conditionalFunc = btController.GetConditionalFunc(data.ConditionalFuncType);
         currentNode = null;
     }
 
     public override void OnEnter()
     {
         base.OnEnter();
-        var data = Data as BTIfData;
         
-        isTrue = data.ConditionalFunc.Invoke();
-        currentNode = isTrue ? data.TrueNode : data.FalseNode;
+        isTrue = conditionalFunc.Invoke();
+        currentNode = isTrue ? trueNode : falseNode;
         currentNode?.OnEnter();
         
         if (currentNode?.IsExecuteNode ?? false)
