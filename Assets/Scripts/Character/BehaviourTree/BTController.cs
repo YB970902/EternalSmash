@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Character;
+using Define;
 using UnityEngine;
 
 using static Define.BehaviourTree;
@@ -58,29 +59,27 @@ public class BTController
     /// <summary>
     /// 함수의 이름을 받으면 그 이름에 맞는 함수를 반환한다.
     /// </summary>
-    public Func<bool> GetConditionalFunc(BTConditional _btConditionalFunc)
+    public Func<bool> GetConditionalFunc(Conditional _conditionalFunc)
     {
-        switch (_btConditionalFunc)
+        switch (_conditionalFunc)
         {
-            case BTConditional.None: return null;
-            case BTConditional.True: return True;
-            case BTConditional.False: return False;
+            case Conditional.None: return null;
+            case Conditional.True: return True;
+            case Conditional.False: return False;
         }
 
         return null;
     }
 
-    public BTExecuteAction GetExecuteAction(BTExecute _executeType)
+    public BTExecuteAction GetExecuteAction(Execute _executeType)
     {
         switch (_executeType)
         {
-            case BTExecute.MoveToTarget: return new BTMoveToTarget();
-            case BTExecute.BTMoveToTarget: return new BTMoveToTarget();
-            case BTExecute.BTTwoTickFail: return new BTTwoTickFail();
-            case BTExecute.BTTwoTickSuccess: return new BTTwoTickSuccess();
-            case BTExecute.BTFindPathRandomTarget: return new BTFindPathRandomTarget();
-            case BTExecute.BTSetRandomTargetIndex: return new BTSetRandomTargetIndex();
-            default: return null;
+            case BehaviourTree.Execute.MoveToTarget: return new BTMoveToTarget();
+            case BehaviourTree.Execute.TwoTickFail: return new BTTwoTickFail();
+            case BehaviourTree.Execute.TwoTickSuccess: return new BTTwoTickSuccess();
+            case BehaviourTree.Execute.FindPathRandomTarget: return new BTFindPathRandomTarget();
+            case BehaviourTree.Execute.SetRandomTargetIndex: return new BTSetRandomTargetIndex();
         }
         
         return null;

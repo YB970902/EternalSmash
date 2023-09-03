@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Editor.BT;
 using UnityEditor;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace Editor.Util
         private VisualElement container;
         private List<MultiPort> portList;
         private BTEditorNode node;
+
+        public int Count => portList.Count;
 
         public MultiPortController()
         {
@@ -49,6 +52,13 @@ namespace Editor.Util
             if (multiPort == null) return;
 
             multiPort.Remove();
+        }
+
+        public int GetConnectedNodeID(int _index)
+        {
+            if (_index < 0 || _index >= portList.Count) return Define.BehaviourTree.InvalidID;
+            var edge = portList[_index].Port.connections.First();
+            return (edge.input.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
         }
     }
 }

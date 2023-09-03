@@ -12,14 +12,17 @@ using UnityEngine;
 
 namespace Editor.BT
 {
-    public class BTEditorWhileNode : VisualElement
+    public class BTEditorWhileNode : VisualElement, IEditorControlNode
     {
+        private BTEditorNode node;
         private Port port;
         
         public int repeatCount { get; private set; }
         
         public BTEditorWhileNode(BTEditorNode _node)
         {
+            node = _node;
+            
             var whileNodeUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/BehaviourTree/BehaviourTreeNode/ControlNode/BTEditorWhileNode.uxml");
             whileNodeUxml.CloneTree(this);
 
@@ -34,6 +37,11 @@ namespace Editor.BT
         private void OnValueChange(ChangeEvent<int> _evt)
         {
             repeatCount = _evt.newValue;
+        }
+
+        public BTData CreateBTData()
+        {
+            return new BTWhileData(node.GetNodeID(), node.GetParentNodeID(), node.GetConnectedNodeID(port), repeatCount);
         }
     }
 }

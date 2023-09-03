@@ -16,9 +16,9 @@ public class BTTester : MonoBehaviour
         btBuilder.Set(btCaller);
         btController = btBuilder.AddNodeData(new BTRootData( 0, 1))
             .AddNodeData(new BTSequenceData(1, 0, new List<int>(3){2, 3, 4}))
-            .AddNodeData(new BTExecuteData(2, 1, BehaviourTree.BTExecute.BTTwoTickSuccess))
-            .AddNodeData(new BTExecuteData(3, 1, BehaviourTree.BTExecute.BTTwoTickFail))
-            .AddNodeData(new BTExecuteData(4, 1, BehaviourTree.BTExecute.BTTwoTickSuccess))
+            .AddNodeData(new BTExecuteData(2, 1, BehaviourTree.Execute.TwoTickSuccess))
+            .AddNodeData(new BTExecuteData(3, 1, BehaviourTree.Execute.TwoTickFail))
+            .AddNodeData(new BTExecuteData(4, 1, BehaviourTree.Execute.TwoTickSuccess))
             .Build();
     }
 

@@ -14,7 +14,7 @@ namespace Editor.BT
 {
     public class BTEditorExecuteNode : BTEditorNode
     {
-        private Define.BehaviourTree.BTExecute exeucteTag;
+        private Define.BehaviourTree.Execute exeucteTag;
         protected override void OnDraw()
         {
             IsWarning = true;
@@ -24,7 +24,7 @@ namespace Editor.BT
 
             var dropdown = this.Q<DropdownField>();
             dropdown.choices = new List<string>();
-            for (var i = Define.BehaviourTree.BTExecute.None; i < Define.BehaviourTree.BTExecute.End; ++i)
+            for (var i = Define.BehaviourTree.Execute.None; i < Define.BehaviourTree.Execute.End; ++i)
             {
                 dropdown.choices.Add(i.ToString());
             }
@@ -33,10 +33,15 @@ namespace Editor.BT
 
         private void OnValueChange(ChangeEvent<string> _evt)
         {
-            if (Enum.TryParse<Define.BehaviourTree.BTExecute>(_evt.newValue, out var tag) == false) return;
+            if (Enum.TryParse<Define.BehaviourTree.Execute>(_evt.newValue, out var tag) == false) return;
 
-            IsWarning = tag == BehaviourTree.BTExecute.None;
+            IsWarning = tag == BehaviourTree.Execute.None;
             exeucteTag = tag;
+        }
+
+        public override BTData CreateBTData()
+        {
+            return new BTExecuteData(GetNodeID(), GetParentNodeID(), exeucteTag);
         }
     }
 }

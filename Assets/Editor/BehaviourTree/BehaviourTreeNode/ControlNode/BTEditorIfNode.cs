@@ -12,21 +12,25 @@ using UnityEngine;
 
 namespace Editor.BT
 {
-    public class BTEditorIfNode : VisualElement
+    public class BTEditorIfNode : VisualElement, IEditorControlNode
     {
+        private BTEditorNode node;
+        
         private Port truePort;
         private Port falsePort;
-        
-        public Define.BehaviourTree.BTConditional BtConditionalType { get; private set; }
+
+        private BehaviourTree.Conditional conditionalType;
         
         public BTEditorIfNode(BTEditorNode _node)
         {
+            node = _node;
+            
             var ifNodeUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/BehaviourTree/BehaviourTreeNode/ControlNode/BTEditorIfNode.uxml");
             ifNodeUxml.CloneTree(this);
 
             var dropdown = this.Q<DropdownField>();
             dropdown.choices = new List<string>();
-            for (var i = Define.BehaviourTree.BTConditional.None; i < Define.BehaviourTree.BTConditional.End; ++i)
+            for (var i = Define.BehaviourTree.Conditional.None; i < Define.BehaviourTree.Conditional.End; ++i)
             {
                 dropdown.choices.Add(i.ToString());
             }
@@ -41,9 +45,14 @@ namespace Editor.BT
 
         private void OnDropdownChanged(ChangeEvent<string> _evt)
         {
-            if (Enum.TryParse<Define.BehaviourTree.BTConditional>(_evt.newValue, out var type) == false) return;
+            if (Enum.TryParse<Define.BehaviourTree.Conditional>(_evt.newValue, out var type) == false) return;
 
-            BtConditionalType = type;
+            conditionalType = type;
+        }
+
+        public BTData CreateBTData()
+        {
+            return new BTIfData(node.GetNodeID(), node.GetParentNodeID(), node.GetConnectedNodeID(truePort), node.GetConnectedNodeID(falsePort), conditionalType);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -26,7 +27,7 @@ namespace Editor.BT
         private BehaviourTreeView treeView;
 
         private List<Port> inputPorts = new List<Port>();
-        private List<Port> outputPorts = new List<Port>();
+        protected List<Port> outputPorts = new List<Port>();
 
         public System.Action<Port> onPortRemoved;
 
@@ -130,9 +131,44 @@ namespace Editor.BT
         {
             evt.menu.AppendAction("Disconnect Input Ports", actionEvent => DisconnectInputPorts());
             evt.menu.AppendAction("Disconnect Output Ports", actionEvent => DisconnectOutputPorts());
-;
+
             base.BuildContextualMenu(evt);
         }
+
+        public int GetNodeID()
+        {
+            return parent.IndexOf(this);
+        }
+
+        public int GetParentNodeID()
+        {
+            var edge = inputPorts[0].connections.First();
+            return (edge.output.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
+        }
+
+        protected int GetChildNodeID(int _index)
+        {
+            if (_index < 0 || _index >= outputPorts.Count) return Define.BehaviourTree.InvalidID;
+            var edge = outputPorts[_index].connections.First();
+            return (edge.input.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
+        }
+
+        public int GetConnectedNodeID(Port _port)
+        {
+            if (_port == null) return Define.BehaviourTree.InvalidID;
+            var edge = _port.connections.First();
+            return (edge.input.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
+        }
+        
+        /// <summary>
+        /// 행동트리 노드 인스턴스화를 위한 BT데이터 값 생성
+        /// </summary>
+        public virtual BTData CreateBTData()
+        {
+            return null;
+        }
+        
+        #region Port
 
         public void DisconnectAllPorts()
         {
@@ -163,6 +199,8 @@ namespace Editor.BT
             base.OnPortRemoved(_port);
             onPortRemoved?.Invoke(_port);
         }
+        
+        #endregion
 
         public override void OnSelected()
         {

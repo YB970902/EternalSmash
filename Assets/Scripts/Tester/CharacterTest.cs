@@ -21,10 +21,10 @@ public class CharacterTest : MonoBehaviour
         btController = btBuilder.AddNodeData(new BTRootData(0, 1))
             .AddNodeData(new BTSequenceData(1, 0, new List<int>() { 2, 3 }))
             .AddNodeData(new BTSequenceData(2, 1, new List<int>(){4, 5}))
-            .AddNodeData(new BTExecuteData(4, 2, BehaviourTree.BTExecute.BTSetRandomTargetIndex))
-            .AddNodeData(new BTExecuteData(5, 2, BehaviourTree.BTExecute.BTFindPathRandomTarget))
+            .AddNodeData(new BTExecuteData(4, 2, BehaviourTree.Execute.SetRandomTargetIndex))
+            .AddNodeData(new BTExecuteData(5, 2, BehaviourTree.Execute.FindPathRandomTarget))
             .AddNodeData(new BTWhileData(3, 1, 6, 0))
-            .AddNodeData(new BTExecuteData(6, 3, BehaviourTree.BTExecute.BTMoveToTarget))
+            .AddNodeData(new BTExecuteData(6, 3, BehaviourTree.Execute.MoveToTarget))
             .Build();
         
         btController.Init(gameObject, 0);

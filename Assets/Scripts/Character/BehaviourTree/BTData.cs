@@ -10,9 +10,6 @@ using UnityEngine;
 /// </summary>
 public abstract class BTData
 {
-    /// <summary> 유효하지 않은 아이디 </summary>
-    public const int InvalidID = 0;
-    
     /// <summary> 부모 노드의 아이디 </summary>
     public int ParentID { get; protected set; }
     /// <summary> 노드마다 부여되는 고유한 아이디. </summary>
@@ -28,7 +25,7 @@ public class BTRootData : BTData
     public BTRootData(int _id, int _childId)
     {
         // Root노드는 부모가 없다.
-        ParentID = InvalidID;
+        ParentID = Define.BehaviourTree.InvalidID;
         ID = _id;
         ChildID = _childId;
     }
@@ -41,8 +38,8 @@ public class BTRootData : BTData
 
 public class BTExecuteData : BTData
 {
-    public Define.BehaviourTree.BTExecute ExecuteType { get; private set; }
-    public BTExecuteData(int _id, int _parentId, Define.BehaviourTree.BTExecute _type)
+    public Define.BehaviourTree.Execute ExecuteType { get; private set; }
+    public BTExecuteData(int _id, int _parentId, Define.BehaviourTree.Execute _type)
     {
         ID = _id;
         ParentID = _parentId;
@@ -91,15 +88,15 @@ public class BTIfData : BTData
 {
     public int TrueNodeID { get; private set; }
     public int FalseNodeID { get; private set; }
-    public Define.BehaviourTree.BTConditional ConditionalFuncType { get; private set; }
+    public Define.BehaviourTree.Conditional ConditionalFuncType { get; private set; }
 
-    public BTIfData(int _id, int _parentId, int _trueNodeId, int _falseNodeId, Define.BehaviourTree.BTConditional _btConditionalFuncType)
+    public BTIfData(int _id, int _parentId, int _trueNodeId, int _falseNodeId, Define.BehaviourTree.Conditional _conditionalFuncType)
     {
         ID = _id;
         ParentID = _parentId;
         TrueNodeID = _trueNodeId;
         FalseNodeID = _falseNodeId;
-        ConditionalFuncType = _btConditionalFuncType;
+        ConditionalFuncType = _conditionalFuncType;
     }
 
     public override BTNodeBase GetNodeInstance()

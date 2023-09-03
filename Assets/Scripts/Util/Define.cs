@@ -35,6 +35,12 @@ namespace Define
 
     public class BehaviourTree
     {
+        /// <summary> 유효하지 않은 아이디 </summary>
+        public const int InvalidID = 0;
+
+        /// <summary> 유효한 아이디의 시작 값 </summary>
+        public const int ValidStartID = 1;
+        
         public enum BTState
         {
             Success,
@@ -67,7 +73,7 @@ namespace Define
             While,
         }
 
-        public enum BTConditional
+        public enum Conditional
         {
             None,
             True,
@@ -77,16 +83,15 @@ namespace Define
             End,
         }
 
-        public enum BTExecute
+        public enum Execute
         {
             None,
             FollowTarget,
             MoveToTarget,
-            BTTwoTickSuccess,
-            BTTwoTickFail,
-            BTFindPathRandomTarget,
-            BTMoveToTarget,
-            BTSetRandomTargetIndex,
+            TwoTickSuccess,
+            TwoTickFail,
+            FindPathRandomTarget,
+            SetRandomTargetIndex,
             Move,
             Idle,
             End,

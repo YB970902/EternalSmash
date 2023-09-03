@@ -12,12 +12,18 @@ using UnityEngine;
 
 namespace Editor.BT
 {
+    public interface IEditorControlNode
+    {
+        public BTData CreateBTData();
+    }
     public class BTEditorControlNode : BTEditorNode
     {
         private VisualElement controlContainer;
         private VisualElement controlData;
 
         private DropdownField controlDropdown;
+
+        private IEditorControlNode controlNode;
         
         protected override void OnDraw()
         {
@@ -51,6 +57,7 @@ namespace Editor.BT
             
             if (_type == BehaviourTree.BTControlNodeType.None)
             {
+                controlNode = null;
                 nodeNameLabel.text = nodeTypeName;
                 onPortRemoved = null;
                 return;
@@ -58,21 +65,35 @@ namespace Editor.BT
 
             nodeNameLabel.text = $"{_type.ToString()}Node";
 
+            VisualElement controlElement;
+            
             switch (_type)
             {
                 case BehaviourTree.BTControlNodeType.Sequence:
-                    controlData.Add(new BTEditorSequenceNode(this));
+                    controlElement = new BTEditorSequenceNode(this);
+                    controlData.Add(controlElement);
                     break;
                 case BehaviourTree.BTControlNodeType.Selector:
-                    controlData.Add(new BTEditorSelectorNode(this));
+                    controlElement = new BTEditorSelectorNode(this); 
+                    controlData.Add(controlElement);
                     break;
                 case BehaviourTree.BTControlNodeType.If:
-                    controlData.Add(new BTEditorIfNode(this));
+                    controlElement = new BTEditorIfNode(this);
+                    controlData.Add(controlElement);
                     break;
                 case BehaviourTree.BTControlNodeType.While:
-                    controlData.Add(new BTEditorWhileNode(this));
+                    controlElement = new BTEditorWhileNode(this);
+                    controlData.Add(controlElement);
                     break;
+                default: return;
             }
+            
+            controlNode = controlElement as IEditorControlNode;
+        }
+
+        public override BTData CreateBTData()
+        {
+            return controlNode.CreateBTData();
         }
     }
 }
