@@ -14,6 +14,8 @@ namespace Editor.BT
         {
         }
 
+        private List<BTEditorNode> editorNodeList = new List<BTEditorNode>();
+
         public BehaviourTreeView()
         {
             Insert(0, new GridBackground());
@@ -24,8 +26,7 @@ namespace Editor.BT
             this.AddManipulator(new RectangleSelector());
             this.AddManipulator(CreateNodeContextualMenu());
 
-            styleSheets.Add(
-                AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/BehaviourTree/BehaviourTreeView.uss"));
+            styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/BehaviourTree/BehaviourTreeView.uss"));
 
             OnElementDestroyed();
         }
@@ -69,11 +70,25 @@ namespace Editor.BT
             var node = Activator.CreateInstance(type) as BTEditorNode;
             node.Init(_position, _nodeType, this);
             node.Draw();
+            
+            editorNodeList.Add(node);
+            
             return node;
+        }
+
+        /// <summary>
+        /// 노드 정보를 저장한다.
+        /// </summary>
+        public void Save()
+        {
+            foreach (var node in editorNodeList)
+            {
+                node.CreateBTData();
+            }
         }
         
         #region Callbacks
-        
+
         private void OnElementDestroyed()
         {
             deleteSelection = (operationName, askUser) =>

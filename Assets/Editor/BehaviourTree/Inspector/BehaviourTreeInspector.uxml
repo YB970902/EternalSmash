@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/BehaviourTree/Inspector/BehaviourTreeInspector.uss?fileID=7433441132597879392&amp;guid=c52814348c4ef4460836d98692b74ac5&amp;type=3#BehaviourTreeInspector" />
+    <ui:VisualElement name="container" style="flex-grow: 1;">
+        <ui:Label text="-" display-tooltip-when-elided="true" name="title" class="--inspector-title" />
+        <ui:Button text="New" display-tooltip-when-elided="true" name="btn-new" class="--inspector-btn" />
+        <ui:Button text="Clear" display-tooltip-when-elided="true" name="btn-clear" class="--inspector-btn" />
+        <ui:Button text="Save" display-tooltip-when-elided="true" name="btn-save" class="--inspector-btn" />
+        <ui:Button text="Save As" display-tooltip-when-elided="true" name="btn-save-as" class="--inspector-btn" />
+        <ui:Button text="Load" display-tooltip-when-elided="true" name="btn-load" class="--inspector-btn" />
+    </ui:VisualElement>
+</ui:UXML>
