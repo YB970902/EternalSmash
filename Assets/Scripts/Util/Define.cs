@@ -5,7 +5,13 @@ using UnityEngine;
 
 namespace Define
 {
-    public class Tile
+    public static class Path
+    {
+        public static readonly string AssetFolder = Application.dataPath;
+        public static readonly string StaticDataFolder = $"{AssetFolder}/StaticData";
+    }
+    
+    public static class Tile
     {
         public const int InvalidTileIndex = -1;
 
@@ -33,7 +39,7 @@ namespace Define
         }
     }
 
-    public class BehaviourTree
+    public static class BehaviourTree
     {
         /// <summary> 유효하지 않은 아이디 </summary>
         public const int InvalidID = 0;
