@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Define;
 using Editor.Util;
+using StaticData;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -39,9 +40,13 @@ namespace Editor.BT
             repeatCount = _evt.newValue;
         }
 
-        public BTData CreateBTData()
+        public void CreateSDBehaviourTreeData(ref SDBehaviourEditorData _data)
         {
-            return new BTWhileData(node.GetNodeID(), node.GetParentNodeID(), node.GetConnectedNodeID(port), repeatCount);
+            _data.Type = BehaviourTree.BTEditorDataType.While;
+            _data.ID = node.GetNodeID();
+            _data.ParentID = node.GetParentNodeID();
+            _data.ChildID = node.GetConnectedNodeID(port);
+            _data.RepeatCount = repeatCount;
         }
     }
 }

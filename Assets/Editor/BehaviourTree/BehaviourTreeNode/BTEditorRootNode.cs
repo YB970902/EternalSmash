@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Define;
+using StaticData;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.Experimental.GraphView;
@@ -16,9 +18,12 @@ namespace Editor.BT
             outputPort.Add(CreateOutputPort());
         }
 
-        public override BTData CreateBTData()
+        public override SDBehaviourEditorData CreateSDBehaviourTreeData()
         {
-            var result = new BTRootData(GetNodeID(), GetChildNodeID(0));
+            var result = base.CreateSDBehaviourTreeData();
+            result.Type = BehaviourTree.BTEditorDataType.Root;
+            result.ID = GetNodeID();
+            result.ChildID = GetChildNodeID(0);
             return result;
         }
     }

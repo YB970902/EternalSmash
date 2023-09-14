@@ -30,10 +30,18 @@ public class BehaviourTreeEditor : EditorWindow
 
         var btnSave = inspectorView.Q<Button>("btn-save");
         btnSave.RegisterCallback<ClickEvent>(OnClickSave);
+        
+        var btnLoad = inspectorView.Q<Button>("btn-load");
+        btnLoad.RegisterCallback<ClickEvent>(OnClickLoad);
     }
 
     private void OnClickSave(ClickEvent _evt)
     {
         treeView.Save();
+    }
+
+    private void OnClickLoad(ClickEvent _evt)
+    {
+        treeView.Load();
     }
 }

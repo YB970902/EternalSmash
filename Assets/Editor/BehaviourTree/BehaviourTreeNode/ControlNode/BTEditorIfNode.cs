@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Define;
 using Editor.Util;
+using StaticData;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -50,9 +51,14 @@ namespace Editor.BT
             conditionalType = type;
         }
 
-        public BTData CreateBTData()
+        public void CreateSDBehaviourTreeData(ref SDBehaviourEditorData _data)
         {
-            return new BTIfData(node.GetNodeID(), node.GetParentNodeID(), node.GetConnectedNodeID(truePort), node.GetConnectedNodeID(falsePort), conditionalType);
+            _data.Type = BehaviourTree.BTEditorDataType.If;
+            _data.ID = node.GetNodeID();
+            _data.ParentID = node.GetParentNodeID();
+            _data.TrueNodeID = node.GetConnectedNodeID(truePort);
+            _data.FalseNodeID = node.GetConnectedNodeID(falsePort);
+            _data.ConditionalFuncType = conditionalType;
         }
     }
 }

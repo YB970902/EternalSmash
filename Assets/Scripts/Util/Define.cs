@@ -70,6 +70,19 @@ namespace Define
             Execute,
         }
 
+        /// <summary>
+        /// 행동트리 에디터 데이터의 종류
+        /// </summary>
+        public enum BTEditorDataType
+        {
+            Root,
+            Execute,
+            Selector,
+            Sequence,
+            If,
+            While,
+        }
+
         public enum BTControlNodeType
         {
             None,

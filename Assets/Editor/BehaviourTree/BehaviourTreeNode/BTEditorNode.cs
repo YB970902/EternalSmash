@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using StaticData;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -163,9 +164,13 @@ namespace Editor.BT
         /// <summary>
         /// 행동트리 노드 인스턴스화를 위한 BT데이터 값 생성
         /// </summary>
-        public virtual BTData CreateBTData()
+        public virtual SDBehaviourEditorData CreateSDBehaviourTreeData()
         {
-            return null;
+            var result = new SDBehaviourEditorData();
+            var position = GetPosition().position;
+            result.X = position.x;
+            result.Y = position.y;
+            return result;
         }
         
         #region Port

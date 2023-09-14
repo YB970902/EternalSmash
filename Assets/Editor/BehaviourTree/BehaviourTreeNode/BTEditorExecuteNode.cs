@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Codice.Client.GameUI.Checkin;
 using Define;
 using Editor.Util;
+using StaticData;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -39,9 +41,14 @@ namespace Editor.BT
             exeucteTag = tag;
         }
 
-        public override BTData CreateBTData()
+        public override SDBehaviourEditorData CreateSDBehaviourTreeData()
         {
-            return new BTExecuteData(GetNodeID(), GetParentNodeID(), exeucteTag);
+            var result = base.CreateSDBehaviourTreeData();
+            result.Type = BehaviourTree.BTEditorDataType.Execute;
+            result.ID = GetNodeID();
+            result.ParentID = GetParentNodeID();
+            result.ExecuteType = exeucteTag;
+            return result;
         }
     }
 }

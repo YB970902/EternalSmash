@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Define;
 using Editor.Util;
+using StaticData;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -14,7 +15,7 @@ namespace Editor.BT
 {
     public interface IEditorControlNode
     {
-        public BTData CreateBTData();
+        public void CreateSDBehaviourTreeData(ref SDBehaviourEditorData _data);
     }
     public class BTEditorControlNode : BTEditorNode
     {
@@ -91,9 +92,11 @@ namespace Editor.BT
             controlNode = controlElement as IEditorControlNode;
         }
 
-        public override BTData CreateBTData()
+        public override SDBehaviourEditorData CreateSDBehaviourTreeData()
         {
-            return controlNode.CreateBTData();
+            var result = base.CreateSDBehaviourTreeData();
+            controlNode.CreateSDBehaviourTreeData(ref result);
+            return result;
         }
     }
 }

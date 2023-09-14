@@ -15,12 +15,12 @@ namespace StaticData
     /// 인스턴스를 byte 파일로 만들어 저장하고, 저장된 byte 파일을 인스턴스로 만드는 관리자이다.
     /// 지금은 단순하게 직렬화/역직렬화를 수행하지만, 추후엔 자동으로 byte파일을 읽어들여서 메모리에 올리게끔 할것이다.
     /// </summary>
-    public class StaticDataManager : MonoSingleton<StaticDataManager>
+    public static class StaticDataManager
     {
         /// <summary>
         /// 데이터를 직렬화한 뒤에 데이터를 저장한다.
         /// </summary>
-        public void Save<T>(T _data, string _name = null)
+        public static void Save<T>(T _data, string _name = null)
         {
             var type = typeof(T);
             var path = GetPath(type, _name);
@@ -37,7 +37,7 @@ namespace StaticData
         /// 파일을 로드하고 데이터를 반환한다.
         /// 경로가 없으면 null을 반환하며, 데이터가 없으면 익셉션을 발생시킨다.
         /// </summary>
-        public T Load<T>(string _name = null) where T: class
+        public static T Load<T>(string _name = null) where T: class
         {
             var type = typeof(T);
             var path = GetPath(type, _name);
@@ -68,7 +68,7 @@ namespace StaticData
         /// <param name="_type"> 데이터의 타입 </param>
         /// <param name="_name"> 데이터의 이름 </param>
         /// <returns> 드라이브에서부터의 경로 </returns>
-        private string GetPath(Type _type, string _name)
+        private static string GetPath(Type _type, string _name)
         {
             var sb = new StringBuilder();
             sb.Append(Define.Path.StaticDataFolder);
@@ -87,7 +87,7 @@ namespace StaticData
         /// <param name="_type"> 데이터의 타입 </param>
         /// <param name="_name"> 데이터의 이름 </param>
         /// <returns> 폴더의 존재 여부 </returns>
-        private bool IsFolderExist(string _fullPath, Type _type, string _name)
+        private static bool IsFolderExist(string _fullPath, Type _type, string _name)
         {
             var assetPath = _fullPath.Substring(_fullPath.LastIndexOf("Assets", StringComparison.Ordinal));
             var folderPath = assetPath.Substring(0, assetPath.LastIndexOf(_name ?? _type.Name, StringComparison.Ordinal));
@@ -101,13 +101,13 @@ namespace StaticData
         /// <param name="_fullPath"> 드라이브에서부터 시작하는 경로 </param>
         /// <param name="_type"> 데이터의 타입 </param>
         /// <param name="_name"> 데이터의 이름 </param>
-        private void CheckFolderExistAndCreate(string _fullPath, Type _type, string _name)
+        private static void CheckFolderExistAndCreate(string _fullPath, Type _type, string _name)
         {
             var assetPath = _fullPath.Substring(_fullPath.LastIndexOf("Assets", StringComparison.Ordinal));
             var folderPath = assetPath.Substring(0, assetPath.LastIndexOf(_name ?? _type.Name, StringComparison.Ordinal));
 
             // 폴더가 없으면 만든다.
-            if (IsFolderExist(_fullPath, _type, _name))
+            if (IsFolderExist(_fullPath, _type, _name) == false)
             {
                 Directory.CreateDirectory(folderPath);
             }

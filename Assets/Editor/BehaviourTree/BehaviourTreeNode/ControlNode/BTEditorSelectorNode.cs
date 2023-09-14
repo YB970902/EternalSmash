@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Define;
 using Editor.Util;
+using StaticData;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -25,15 +26,18 @@ namespace Editor.BT
             Add(multiPortController);
         }
         
-        public BTData CreateBTData()
+        public void CreateSDBehaviourTreeData(ref SDBehaviourEditorData _data)
         {
             var children = new List<int>(multiPortController.Count);
             for (int i = 0, count = multiPortController.Count; i < count; ++i)
             {
                 children.Add(multiPortController.GetConnectedNodeID(i));
             }
-
-            return new BTSequenceData(node.GetNodeID(), node.GetParentNodeID(), children);
+            
+            _data.Type = BehaviourTree.BTEditorDataType.Selector;
+            _data.ID = node.GetNodeID();
+            _data.ParentID = node.GetParentNodeID();
+            _data.ChildrenID = children;
         }
     }
 }

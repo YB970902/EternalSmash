@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Define;
+using StaticData;
 
 namespace Editor.BT
 {
@@ -76,14 +78,42 @@ namespace Editor.BT
             return node;
         }
 
+        private void CreateNode(SDBehaviourEditorData _sdData)
+        {
+            var position = new Vector2(_sdData.X, _sdData.Y);
+            var type = System.Type.GetType($"Editor.BT.BTEditor{_sdData.Type.ToBtNodeType()}Node");
+            var node = Activator.CreateInstance(type) as BTEditorNode;
+            node.Init(position, _sdData.Type.ToBtNodeType(), this);
+            node.Draw();
+            
+            editorNodeList.Add(node);
+            
+            AddElement(node);
+        }
+
         /// <summary>
         /// 노드 정보를 저장한다.
         /// </summary>
         public void Save()
         {
-            foreach (var node in editorNodeList)
+            var editorDatas = new List<SDBehaviourEditorData>(editorNodeList.Count);
+            editorDatas.AddRange(editorNodeList.Select(node => node.CreateSDBehaviourTreeData()));
+
+            SDBehaviourEditorDataList dataList = new SDBehaviourEditorDataList();
+            dataList.EditorDatas = editorDatas;
+
+            StaticDataManager.Save(dataList, "default");
+        }
+
+        /// <summary>
+        /// 노드 정보를 불러온다.
+        /// </summary>
+        public void Load()
+        {
+            var data = StaticDataManager.Load<SDBehaviourEditorDataList>("default");
+            foreach (var sdData in data.EditorDatas)
             {
-                node.CreateBTData();
+                CreateNode(sdData);
             }
         }
         
