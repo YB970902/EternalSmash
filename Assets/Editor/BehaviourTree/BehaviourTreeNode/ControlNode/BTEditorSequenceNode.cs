@@ -36,9 +36,20 @@ namespace Editor.BT
             }
 
             _data.Type = BehaviourTree.BTEditorDataType.Sequence;
-            _data.ID = node.GetNodeID();
+            _data.NodeID = node.GetNodeID();
             _data.ParentID = node.GetParentNodeID();
             _data.ChildrenID = children;
+        }
+
+        public void SetConnectData(SDBehaviourEditorData _data, BehaviourTreeView _treeView)
+        {
+            var index = 0;
+            foreach(var childID in _data.ChildrenID)
+            {
+                multiPortController.OnClickAddButton(null);
+                var childNode = _treeView.GetNodeByIndex(childID).Q<BTEditorNode>();
+                _treeView.Add(multiPortController.Port(index++).ConnectTo(childNode.InputPort));
+            }
         }
     }
 }

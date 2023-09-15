@@ -45,10 +45,16 @@ namespace Editor.BT
         {
             var result = base.CreateSDBehaviourTreeData();
             result.Type = BehaviourTree.BTEditorDataType.Execute;
-            result.ID = GetNodeID();
+            result.NodeID = GetNodeID();
             result.ParentID = GetParentNodeID();
             result.ExecuteType = exeucteTag;
             return result;
+        }
+
+        public override void SetSdData(SDBehaviourEditorData _data)
+        {
+            var dropdown = this.Q<DropdownField>();
+            dropdown.value = _data.ExecuteType.ToString();
         }
     }
 }

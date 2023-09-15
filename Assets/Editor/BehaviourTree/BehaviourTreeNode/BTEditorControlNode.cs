@@ -16,6 +16,7 @@ namespace Editor.BT
     public interface IEditorControlNode
     {
         public void CreateSDBehaviourTreeData(ref SDBehaviourEditorData _data);
+        public void SetConnectData(SDBehaviourEditorData _data, BehaviourTreeView _treeView);
     }
     public class BTEditorControlNode : BTEditorNode
     {
@@ -40,15 +41,29 @@ namespace Editor.BT
             controlDropdown.choices.Add(Define.BehaviourTree.BTControlNodeType.Selector.ToString());
             controlDropdown.choices.Add(Define.BehaviourTree.BTControlNodeType.If.ToString());
             controlDropdown.choices.Add(Define.BehaviourTree.BTControlNodeType.While.ToString());
-            controlDropdown.RegisterValueChangedCallback(evt =>
-            {
-                if (Enum.TryParse<BehaviourTree.BTControlNodeType>(evt.newValue, out var type))
-                {
-                    OnChangeChoiceType(type);
-                }
-            });
+            controlDropdown.RegisterValueChangedCallback(OnChangeDropdown);
 
             inputPort.Add(CreateInputPort());
+        }
+
+        private void OnChangeDropdown(ChangeEvent<string> _evt)
+        {
+            if (Enum.TryParse<BehaviourTree.BTControlNodeType>(_evt.newValue, out var type) == false) return;
+            
+            OnChangeChoiceType(type);
+        }
+
+        public override void SetSdData(SDBehaviourEditorData _data)
+        {
+            controlDropdown.value = _data.Type.ToString();
+            controlDropdown.RegisterValueChangedCallback(OnSettingSdData);
+            return;
+            
+            void OnSettingSdData(ChangeEvent<string> _evt)
+            {
+                controlDropdown.UnregisterValueChangedCallback(OnSettingSdData);
+                controlNode.SetConnectData(_data, treeView);
+            }
         }
 
         private void OnChangeChoiceType(Define.BehaviourTree.BTControlNodeType _type)

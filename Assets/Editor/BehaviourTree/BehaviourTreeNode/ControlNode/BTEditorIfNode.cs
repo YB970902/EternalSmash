@@ -54,11 +54,22 @@ namespace Editor.BT
         public void CreateSDBehaviourTreeData(ref SDBehaviourEditorData _data)
         {
             _data.Type = BehaviourTree.BTEditorDataType.If;
-            _data.ID = node.GetNodeID();
+            _data.NodeID = node.GetNodeID();
             _data.ParentID = node.GetParentNodeID();
             _data.TrueNodeID = node.GetConnectedNodeID(truePort);
             _data.FalseNodeID = node.GetConnectedNodeID(falsePort);
             _data.ConditionalFuncType = conditionalType;
+        }
+
+        public void SetConnectData(SDBehaviourEditorData _data, BehaviourTreeView _treeView)
+        {
+            var trueNode = _treeView.GetNodeByIndex(_data.TrueNodeID).Q<BTEditorNode>();
+            var falseNode = _treeView.GetNodeByIndex(_data.FalseNodeID).Q<BTEditorNode>();
+            _treeView.Add(truePort.ConnectTo(trueNode.InputPort));
+            _treeView.Add(falsePort.ConnectTo(falseNode.InputPort));
+            
+            var dropdown = this.Q<DropdownField>();
+            dropdown.value = _data.ConditionalFuncType.ToString();
         }
     }
 }

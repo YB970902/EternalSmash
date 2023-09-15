@@ -12,24 +12,25 @@ namespace StaticData
 {
     /// <summary>
     /// 고정 데이터 관리자.
-    /// 인스턴스를 byte 파일로 만들어 저장하고, 저장된 byte 파일을 인스턴스로 만드는 관리자이다.
-    /// 지금은 단순하게 직렬화/역직렬화를 수행하지만, 추후엔 자동으로 byte파일을 읽어들여서 메모리에 올리게끔 할것이다.
+    /// 인스턴스를 byte 파일로 만들어 저장하고, 저장된 byte 파일을 인스턴스로 만드는 기능을 제공한다.
     /// </summary>
     public static class StaticDataManager
     {
         /// <summary>
         /// 데이터를 직렬화한 뒤에 데이터를 저장한다.
         /// </summary>
-        public static void Save<T>(T _data, string _name = null)
+        public static void Save<T>(List<T> _data, string _name = null) where T: StaticDataBase
         {
             var type = typeof(T);
             var path = GetPath(type, _name);
 
             CheckFolderExistAndCreate(path, type, _name);
 
+            var collection = new StaticDataCollection<T> { DataList = _data };
+
             using var fileStream = File.Open(path, FileMode.Create, FileAccess.Write);
             
-            var bytes = MemoryPackSerializer.Serialize(_data);
+            var bytes = MemoryPackSerializer.Serialize(collection);
             fileStream.Write(bytes, 0, bytes.Length);
         }
 
@@ -37,7 +38,7 @@ namespace StaticData
         /// 파일을 로드하고 데이터를 반환한다.
         /// 경로가 없으면 null을 반환하며, 데이터가 없으면 익셉션을 발생시킨다.
         /// </summary>
-        public static T Load<T>(string _name = null) where T: class
+        public static StaticDataCollection<T> Load<T>(string _name = null) where T: StaticDataBase
         {
             var type = typeof(T);
             var path = GetPath(type, _name);
@@ -47,15 +48,15 @@ namespace StaticData
             var assetPath = path.Substring(path.LastIndexOf("Asset", StringComparison.Ordinal));
             var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
             
-            T result = null;
+            StaticDataCollection<T> result = null;
             
             try
             {
-                MemoryPackSerializer.Deserialize<T>(textAsset.bytes, ref result);
+                MemoryPackSerializer.Deserialize(textAsset.bytes, ref result);
             }
-            catch
+            catch(Exception e)
             {
-                Debug.LogError($"StaticData Load Error! - Path : {assetPath}");
+                Debug.LogError($"StaticData Load Error! [{e.Message}] - Path : {assetPath}");
                 throw;
             }
 

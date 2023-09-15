@@ -25,10 +25,13 @@ namespace Editor.BT
 
         protected Label nodeNameLabel { get; private set; }
 
-        private BehaviourTreeView treeView;
+        protected BehaviourTreeView treeView;
 
         private List<Port> inputPorts = new List<Port>();
-        protected List<Port> outputPorts = new List<Port>();
+        private List<Port> outputPorts = new List<Port>();
+
+        public Port InputPort => inputPorts[0];
+        public Port OutputPort(int _index) => outputPorts[_index];
 
         public System.Action<Port> onPortRemoved;
 
@@ -66,13 +69,13 @@ namespace Editor.BT
         {
             treeView = _treeView;
             nodeTypeName = $"{_nodeType.ToString()}Node";
-
+            
             SetPosition(new Rect(_position, Vector2.zero));
+        }
 
-            List<int> list = new List<int>() { 1, 2, 3, 4, 5 };
-            list.Add(6);
-            var readList = list.AsReadOnly();
-            var item = readList[0];
+        public virtual void SetSdData(SDBehaviourEditorData _data)
+        {
+            
         }
         
         public void Draw()
@@ -147,7 +150,7 @@ namespace Editor.BT
             return (edge.output.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
         }
 
-        protected int GetChildNodeID(int _index)
+        public int GetChildNodeID(int _index)
         {
             if (_index < 0 || _index >= outputPorts.Count) return Define.BehaviourTree.InvalidID;
             var edge = outputPorts[_index].connections.First();
@@ -160,7 +163,7 @@ namespace Editor.BT
             var edge = _port.connections.First();
             return (edge.input.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
         }
-        
+
         /// <summary>
         /// 행동트리 노드 인스턴스화를 위한 BT데이터 값 생성
         /// </summary>

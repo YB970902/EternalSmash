@@ -78,42 +78,51 @@ namespace Editor.BT
             return node;
         }
 
-        private void CreateNode(SDBehaviourEditorData _sdData)
+        private BTEditorNode CreateNode(SDBehaviourEditorData _sdData)
         {
-            var position = new Vector2(_sdData.X, _sdData.Y);
             var type = System.Type.GetType($"Editor.BT.BTEditor{_sdData.Type.ToBtNodeType()}Node");
             var node = Activator.CreateInstance(type) as BTEditorNode;
-            node.Init(position, _sdData.Type.ToBtNodeType(), this);
+            node.Init(new Vector2(_sdData.X, _sdData.Y), _sdData.Type.ToBtNodeType(), this);
             node.Draw();
             
             editorNodeList.Add(node);
             
             AddElement(node);
+            
+            return node;
+        }
+
+        public Node GetNodeByIndex(int _index)
+        {
+            return editorNodeList[_index];
         }
 
         /// <summary>
         /// 노드 정보를 저장한다.
         /// </summary>
-        public void Save()
+        public void Save(string _name)
         {
-            var editorDatas = new List<SDBehaviourEditorData>(editorNodeList.Count);
-            editorDatas.AddRange(editorNodeList.Select(node => node.CreateSDBehaviourTreeData()));
-
-            SDBehaviourEditorDataList dataList = new SDBehaviourEditorDataList();
-            dataList.EditorDatas = editorDatas;
-
-            StaticDataManager.Save(dataList, "default");
+            StaticDataManager.Save(editorNodeList.Select(_node => _node.CreateSDBehaviourTreeData()).ToList(), _name);
         }
 
         /// <summary>
         /// 노드 정보를 불러온다.
         /// </summary>
-        public void Load()
+        public void Load(string _name)
         {
-            var data = StaticDataManager.Load<SDBehaviourEditorDataList>("default");
-            foreach (var sdData in data.EditorDatas)
+            AssetDatabase.Refresh();
+            var data = StaticDataManager.Load<SDBehaviourEditorData>(_name);
+            var orderedData = data.DataList.OrderBy(_ => _.NodeID).ToList();
+            var editorNodes = new List<BTEditorNode>(orderedData.Count);
+            
+            foreach (var sdData in orderedData)
             {
-                CreateNode(sdData);
+                editorNodes.Add(CreateNode(sdData));
+            }
+
+            for (int i = 0, count = editorNodes.Count; i < count; ++i)
+            {
+                editorNodes[i].SetSdData(orderedData[i]);
             }
         }
         

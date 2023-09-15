@@ -37,11 +37,11 @@ public class BehaviourTreeEditor : EditorWindow
 
     private void OnClickSave(ClickEvent _evt)
     {
-        treeView.Save();
+        treeView.Save("default");
     }
 
     private void OnClickLoad(ClickEvent _evt)
     {
-        treeView.Load();
+        treeView.Load("default");
     }
 }

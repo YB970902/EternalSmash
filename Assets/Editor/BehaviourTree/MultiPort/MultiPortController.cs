@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Editor.BT;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,6 +14,8 @@ namespace Editor.Util
         private VisualElement container;
         private List<MultiPort> portList;
         private BTEditorNode node;
+
+        public Port Port(int _index) => portList[_index].Port;
 
         public int Count => portList.Count;
 
@@ -31,7 +34,7 @@ namespace Editor.Util
             node.onPortRemoved = OnPortRemoved;
         }
 
-        private void OnClickAddButton(ClickEvent _evt)
+        public void OnClickAddButton(ClickEvent _evt)
         {
             var port = new MultiPort();
             port.Init(this, node.CreateOutputPort());
