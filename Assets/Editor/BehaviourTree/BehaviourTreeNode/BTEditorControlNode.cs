@@ -55,6 +55,8 @@ namespace Editor.BT
 
         public override void SetSdData(SDBehaviourEditorData _data)
         {
+            base.SetSdData(_data);
+            
             controlDropdown.value = _data.Type.ToString();
             controlDropdown.RegisterValueChangedCallback(OnSettingSdData);
             return;

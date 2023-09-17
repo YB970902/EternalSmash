@@ -75,7 +75,7 @@ namespace Editor.BT
 
         public virtual void SetSdData(SDBehaviourEditorData _data)
         {
-            
+            nodeNameLabel.text = _data.NickName;
         }
         
         public void Draw()
@@ -170,6 +170,7 @@ namespace Editor.BT
         public virtual SDBehaviourEditorData CreateSDBehaviourTreeData()
         {
             var result = new SDBehaviourEditorData();
+            result.NickName = nodeNameLabel.text;
             var position = GetPosition().position;
             result.X = position.x;
             result.Y = position.y;

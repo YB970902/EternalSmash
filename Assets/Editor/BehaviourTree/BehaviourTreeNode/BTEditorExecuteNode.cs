@@ -53,6 +53,8 @@ namespace Editor.BT
 
         public override void SetSdData(SDBehaviourEditorData _data)
         {
+            base.SetSdData(_data);
+            
             var dropdown = this.Q<DropdownField>();
             dropdown.value = _data.ExecuteType.ToString();
         }

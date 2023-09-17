@@ -12,6 +12,8 @@ namespace StaticData
     [MemoryPackable]
     public partial class SDBehaviourEditorData : StaticDataBase
     {
+        /// <summary> 노드의 별명 </summary>
+        public string NickName { get; set; }
         /// <summary> 행동트리 타입 </summary>
         public BehaviourTree.BTEditorDataType Type { get; set; }
         /// <summary> 에디터상의 노드 좌표 X </summary>

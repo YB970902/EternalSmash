@@ -15,6 +15,8 @@ namespace Editor.BT
     {
         public override void SetSdData(SDBehaviourEditorData _data)
         {
+            base.SetSdData(_data);
+            
             var port = OutputPort(0);
             var targetNode = treeView.GetNodeByIndex(_data.ChildID).Q<BTEditorNode>();
             treeView.Add(port.ConnectTo(targetNode.InputPort));
