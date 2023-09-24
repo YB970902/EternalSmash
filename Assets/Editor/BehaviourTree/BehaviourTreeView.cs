@@ -141,6 +141,7 @@ namespace Editor.BT
                 {
                     if (selectedElement is BTEditorNode node)
                     {
+                        editorNodeList.Remove(node);
                         nodesToDelete.Add(node);
                         continue;
                     }
