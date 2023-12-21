@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 public class BehaviourTreeEditor : EditorWindow
 {
     [SerializeField] private VisualTreeAsset behaviourTreeUxml;
-    [SerializeField] private VisualTreeAsset inspectorUxml;
 
     private BehaviourTreeView treeView;
     
@@ -23,24 +22,24 @@ public class BehaviourTreeEditor : EditorWindow
         VisualElement root = rootVisualElement;
         behaviourTreeUxml.CloneTree(root);
 
-        var inspectorView = root.Q<VisualElement>("inspector-view"); 
-        inspectorUxml.CloneTree(inspectorView);
-
         treeView = root.Q<BehaviourTreeView>();
 
-        var btnSave = inspectorView.Q<Button>("btn-save");
-        btnSave.RegisterCallback<ClickEvent>(OnClickSave);
-        
-        var btnLoad = inspectorView.Q<Button>("btn-load");
-        btnLoad.RegisterCallback<ClickEvent>(OnClickLoad);
+        root.Q<Button>("btn_new").clicked += OnClickNew;
+        root.Q<Button>("btn_open").clicked += OnClickOpen;
+        root.Q<Button>("btn_save").clicked += OnClickSave;
     }
 
-    private void OnClickSave(ClickEvent _evt)
+    private void OnClickNew()
+    {
+        treeView.Load("");
+    }
+    
+    private void OnClickSave()
     {
         treeView.Save("default");
     }
 
-    private void OnClickLoad(ClickEvent _evt)
+    private void OnClickOpen()
     {
         treeView.Load("default");
     }
