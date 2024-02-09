@@ -5,7 +5,13 @@ using UnityEngine;
 
 namespace Define
 {
-    public class Tile
+    public static class Path
+    {
+        public static readonly string AssetFolder = Application.dataPath;
+        public static readonly string StaticDataFolder = $"{AssetFolder}/StaticData";
+    }
+    
+    public static class Tile
     {
         public const int InvalidTileIndex = -1;
 
@@ -33,8 +39,14 @@ namespace Define
         }
     }
 
-    public class BehaviourTree
+    public static class BehaviourTree
     {
+        /// <summary> 유효하지 않은 아이디 </summary>
+        public const int InvalidID = 0;
+
+        /// <summary> 유효한 아이디의 시작 값 </summary>
+        public const int ValidStartID = 1;
+        
         public enum BTState
         {
             Success,
@@ -51,10 +63,57 @@ namespace Define
             CheckRunning = 1 << 2,
         }
 
-        public static class Conditional
+        public enum BTNodeType
         {
-            public const string True = "True";
-            public const string False = "False";
+            Root,
+            Control,
+            Execute,
+        }
+
+        /// <summary>
+        /// 행동트리 에디터 데이터의 종류
+        /// </summary>
+        public enum BTEditorDataType
+        {
+            Root,
+            Execute,
+            Selector,
+            Sequence,
+            If,
+            While,
+        }
+
+        public enum BTControlNodeType
+        {
+            None,
+            Sequence,
+            Selector,
+            If,
+            While,
+        }
+
+        public enum Conditional
+        {
+            None,
+            True,
+            False,
+            HasTarget,
+            IsArrived,
+            End,
+        }
+
+        public enum Execute
+        {
+            None,
+            FollowTarget,
+            MoveToTarget,
+            TwoTickSuccess,
+            TwoTickFail,
+            FindPathRandomTarget,
+            SetRandomTargetIndex,
+            Move,
+            Idle,
+            End,
         }
     }
 }

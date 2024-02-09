@@ -3,107 +3,105 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 행동트리의 노드가 기본적으로 가져올 값이다.
-/// 각 노드별로 필요한 데이터들은 이 클래스로부 파생되어야 한다.
-/// 만약 BTNodeBase를 변수로 가지고 있어야 한다면, 노드의 Id를 따로 가지고 있어야 한다. 
+/// 노드가 가지고 있어야하는 부모/자식의 ID와 그 외의 정보를 보관하고 있는 클래스이다.
+/// BTData의 타입에 맞는 빈 노드를 생성하고 반환할 수 있다.
+/// BTBuilder가 빈 노드를 모두 받은다음, BTData가 가지고 있는 정보를 기반기반으로 빈 노드들에 값을 채운다.
+/// 데이터 가공이 끝나면 BTBuilder가 가지고 있는 빈 노드에 BTData를 넣어서 값을 채운다.
 /// </summary>
-public class BTData
+public abstract class BTData
 {
-    /// <summary> 노드의 아이디가 유효하지 않은지 구분하기 위한 값. </summary>
-    public const int InvalidID = 0;
-    
-    /// <summary> 노드마다 부여되는 고유한 아이디. 1부터 시작한다. </summary>
+    /// <summary> 부모 노드의 아이디 </summary>
+    public int ParentID { get; protected set; }
+    /// <summary> 노드마다 부여되는 고유한 아이디. </summary>
     public int ID { get; protected set; }
 
-    /// <summary> 노드를 값을 받아내는 함수 </summary>
-    protected System.Action nodeSetSequence;
-
-    /// <summary>
-    /// 받아야하는 노드의 ID만 보관중이던 액션을 수행하는 함수.
-    /// </summary>
-    public void SetValue()
-    {
-        nodeSetSequence?.Invoke();
-        nodeSetSequence = null;
-    }
+    public abstract BTNodeBase GetNodeInstance();
 }
 
 public class BTRootData : BTData
 {
-    public BTNodeBase Child { get; private set; }
-
-    public static BTRootData Create(BTBuilder _builder, int _id, int _childId)
+    public int ChildID { get; private set; }
+    
+    public BTRootData(int _id, int _childId)
     {
-        var result = new BTRootData();
-        result.ID = _id;
-        result.nodeSetSequence += () => { result.Child = _builder.GetNode(_childId); };
-        return result;
+        // Root노드는 부모가 없다.
+        ParentID = Define.BehaviourTree.InvalidID;
+        ID = _id;
+        ChildID = _childId;
+    }
+    
+    public override BTNodeBase GetNodeInstance()
+    {
+        return new BTRoot();
     }
 }
 
 public class BTExecuteData : BTData
 {
-    public static BTExecuteData Create(int _id)
+    public Define.BehaviourTree.Execute ExecuteType { get; private set; }
+    public BTExecuteData(int _id, int _parentId, Define.BehaviourTree.Execute _type)
     {
-        var result = new BTExecuteData();
-        result.ID = _id;
-        return result;
+        ID = _id;
+        ParentID = _parentId;
+        ExecuteType = _type;
+    }
+
+    public override BTNodeBase GetNodeInstance()
+    {
+        return new BTExecuteNode();
     }
 }
 
 public class BTSelectorData : BTData
 {
-    public List<BTNodeBase> Children { get; private set; }
-    public static BTSelectorData Create(BTBuilder _builder, int _id, List<int> _childrenId)
+    public List<int> ChildrenID { get; private set; }
+    public BTSelectorData(int _id, int _parentId, List<int> _childrenId)
     {
-        var result = new BTSelectorData();
-        result.ID = _id;
-        result.Children = new List<BTNodeBase>(_childrenId.Count);
-        for (int i = 0, count = _childrenId.Count; i < count; ++i)
-        {
-            result.Children.Add(null);
-            var index = i;
-            var nodeId = _childrenId[i];
-            result.nodeSetSequence += () => { result.Children[index] = _builder.GetNode(nodeId); };
-        }
-        return result;
+        ID = _id;
+        ParentID = _parentId;
+        ChildrenID = _childrenId;
+    }
+
+    public override BTNodeBase GetNodeInstance()
+    {
+        return new BTSelector();
     }
 }
 
 public class BTSequenceData : BTData
 {
-    public List<BTNodeBase> Children { get; private set; }
-    public static BTSequenceData Create(BTBuilder _builder, int _id, List<int> _childrenId)
+    public List<int> ChildrenID { get; private set; }
+    public BTSequenceData(int _id, int _parentId, List<int> _childrenId)
     {
-        var result = new BTSequenceData();
-        result.ID = _id;
-        result.Children = new List<BTNodeBase>(_childrenId.Count);
-        for (int i = 0, count = _childrenId.Count; i < count; ++i)
-        {
-            result.Children.Add(null);
-            var index = i;
-            var nodeId = _childrenId[i];
-            result.nodeSetSequence += () => { result.Children[index] = _builder.GetNode(nodeId); };
-        }
-        return result;
+        ID = _id;
+        ParentID = _parentId;
+        ChildrenID = _childrenId;
+    }
+
+    public override BTNodeBase GetNodeInstance()
+    {
+        return new BTSequence();
     }
 }
 
 public class BTIfData : BTData
 {
-    public BTNodeBase TrueNode { get; private set; }
-    public BTNodeBase FalseNode { get; private set; }
-    
-    public System.Func<bool> ConditionalFunc { get; private set; }
+    public int TrueNodeID { get; private set; }
+    public int FalseNodeID { get; private set; }
+    public Define.BehaviourTree.Conditional ConditionalFuncType { get; private set; }
 
-    public static BTIfData Create(BTBuilder _builder, int _id, int _trueNodeId, int _falseNodeId, string _funcName)
+    public BTIfData(int _id, int _parentId, int _trueNodeId, int _falseNodeId, Define.BehaviourTree.Conditional _conditionalFuncType)
     {
-        var result = new BTIfData();
-        result.ID = _id;
-        result.nodeSetSequence += () => { result.TrueNode = _builder.GetNode(_trueNodeId); };
-        result.nodeSetSequence += () => { result.FalseNode = _builder.GetNode(_falseNodeId); };
-        result.ConditionalFunc = _builder.GetFunction(_funcName);
-        return result;
+        ID = _id;
+        ParentID = _parentId;
+        TrueNodeID = _trueNodeId;
+        FalseNodeID = _falseNodeId;
+        ConditionalFuncType = _conditionalFuncType;
+    }
+
+    public override BTNodeBase GetNodeInstance()
+    {
+        return new BTIf();
     }
 }
 
@@ -112,14 +110,18 @@ public class BTWhileData : BTData
     /// <summary> 반복 횟수. 0이면 무한반복이다. </summary>
     public int RepeatCount { get; private set; }
     
-    public BTNodeBase Child { get; private set; }
+    public int ChildID { get; private set; }
 
-    public static BTWhileData Create(BTBuilder _builder, int _id, int _childId, int _repeatCount)
+    public BTWhileData(int _id, int _parentId, int _childId, int _repeatCount)
     {
-        var result = new BTWhileData();
-        result.ID = _id;
-        result.nodeSetSequence += () => { result.Child = _builder.GetNode(_childId); };
-        result.RepeatCount = _repeatCount;
-        return result;
+        ID = _id;
+        ParentID = _parentId;
+        ChildID = _childId;
+        RepeatCount = _repeatCount;
+    }
+
+    public override BTNodeBase GetNodeInstance()
+    {
+        return new BTWhile();
     }
 }

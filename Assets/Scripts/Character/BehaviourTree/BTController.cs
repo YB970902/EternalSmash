@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Character;
+using Define;
 using UnityEngine;
 
 using static Define.BehaviourTree;
@@ -57,17 +59,32 @@ public class BTController
     /// <summary>
     /// 함수의 이름을 받으면 그 이름에 맞는 함수를 반환한다.
     /// </summary>
-    public System.Func<bool> GetConditionalFunc(string _funcName)
+    public Func<bool> GetConditionalFunc(Conditional _conditionalFunc)
     {
-        switch (_funcName)
+        switch (_conditionalFunc)
         {
+            case Conditional.None: return null;
             case Conditional.True: return True;
             case Conditional.False: return False;
         }
 
         return null;
     }
-    
+
+    public BTExecuteAction GetExecuteAction(Execute _executeType)
+    {
+        switch (_executeType)
+        {
+            case BehaviourTree.Execute.MoveToTarget: return new BTMoveToTarget();
+            case BehaviourTree.Execute.TwoTickFail: return new BTTwoTickFail();
+            case BehaviourTree.Execute.TwoTickSuccess: return new BTTwoTickSuccess();
+            case BehaviourTree.Execute.FindPathRandomTarget: return new BTFindPathRandomTarget();
+            case BehaviourTree.Execute.SetRandomTargetIndex: return new BTSetRandomTargetIndex();
+        }
+        
+        return null;
+    }
+
     /// <summary>
     /// 현재 실행중인 노드를 설정하는 함수
     /// </summary>

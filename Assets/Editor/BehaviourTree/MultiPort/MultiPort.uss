@@ -1,0 +1,17 @@
+.--multi-port {
+    align-items: stretch;
+    width: 50px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.--multi-port-btn-remove {
+    width: 50px;
+    background-color: rgb(168, 75, 75);
+}

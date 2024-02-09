@@ -7,22 +7,27 @@ using UnityEngine;
 public class BTWhile : BTControlNodeBase
 {
     private int currentRepeatCount;
-    protected override void Init(BTData _data)
+
+    private int maxRepeatCount;
+    private BTNodeBase child;
+    protected override void OnInit(BTBuilder _builder, BTData _data)
     {
-        if (_data is not BTWhileData)
+        var data = _data as BTWhileData;
+        if (data != null)
         {
             Debug.LogError("data type is not BTWhileData");
             return;
         }
 
-        Data = _data;
+        maxRepeatCount = data.RepeatCount;
+        child = _builder.GetNode(data.ChildID);
     }
 
     public override void OnEnter()
     {
         base.OnEnter();
         currentRepeatCount = 0;
-        currentNode = (Data as BTWhileData).Child;
+        currentNode = child;
         currentNode.OnEnter();
         
         if (currentNode.IsExecuteNode)
@@ -45,21 +50,19 @@ public class BTWhile : BTControlNodeBase
 
     public override void OnChildEvaluated(BehaviourTree.BTState _state)
     {
-        var data = Data as BTWhileData;
-        
         switch (_state)
         {
             case BehaviourTree.BTState.Success:
                 currentNode.OnExit();
                 
-                if (data.RepeatCount == 0)
+                if (maxRepeatCount == 0)
                 {
                     currentNode.OnEnter();
                     break;
                 }
                 
                 ++currentRepeatCount;
-                if (currentRepeatCount >= data.RepeatCount) // 반복횟수를 다 채운 경우
+                if (currentRepeatCount >= maxRepeatCount) // 반복횟수를 다 채운 경우
                 {
                     btCaller.OnChildEvaluated(BehaviourTree.BTState.Success); // 성공 반환
                     break;

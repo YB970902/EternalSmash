@@ -22,8 +22,6 @@ public abstract class BTCaller
     /// 부모 노드에게 판정 결과를 반환하는 함수
     /// </summary>
     public abstract void OnChildEvaluated(BTState _state);
-
-    public abstract BTCaller Clone();
 }
 
 public class BTDefaultCaller : BTCaller
@@ -31,11 +29,6 @@ public class BTDefaultCaller : BTCaller
     public override void OnChildEvaluated(BTState _state)
     {
         cbOnChildEvaluated.Invoke(_state);
-    }
-
-    public override BTCaller Clone()
-    {
-        return new BTDefaultCaller();
     }
 }
 
@@ -83,12 +76,5 @@ public class BTDebugCaller : BTCaller
         
         Debug.Log($"caller : [{name}] id : [{data.ID}] state : [{_state.ToString()}]");
         cbOnChildEvaluated.Invoke(_state);
-    }
-
-    public override BTCaller Clone()
-    {
-        var result = new BTDebugCaller();
-        result.Init(flag);
-        return result;
     }
 }

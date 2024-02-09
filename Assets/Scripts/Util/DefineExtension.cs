@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Define;
 using UnityEngine;
 
 public static class DefineExtension
@@ -36,5 +37,18 @@ public static class DefineExtension
         }
 
         return Define.Tile.Direct.End;
+    }
+
+    public static Define.BehaviourTree.BTNodeType ToBtNodeType(this Define.BehaviourTree.BTEditorDataType _type)
+    {
+        switch (_type)
+        {
+            case BehaviourTree.BTEditorDataType.Root:
+                return BehaviourTree.BTNodeType.Root;
+            case BehaviourTree.BTEditorDataType.Execute:
+                return BehaviourTree.BTNodeType.Execute;
+            default:
+                return BehaviourTree.BTNodeType.Control;
+        }
     }
 }

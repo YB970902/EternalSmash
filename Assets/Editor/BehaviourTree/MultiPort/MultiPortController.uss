@@ -1,0 +1,9 @@
+.--mult-port-add-button {
+    height: auto;
+    width: 50px;
+}
+
+.--multi-port-container {
+    flex-direction: row;
+    height: 50px;
+}

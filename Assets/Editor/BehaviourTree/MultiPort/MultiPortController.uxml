@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/BehaviourTree/MultiPort/MultiPortController.uss?fileID=7433441132597879392&amp;guid=ad0fb166fd3b544fdb449a0fe4e3e35d&amp;type=3#MultiPortController" />
+    <ui:VisualElement name="multi-port-container" class="--multi-port-container">
+        <ui:Button text="+" display-tooltip-when-elided="true" name="add-button" class="--mult-port-add-button" />
+    </ui:VisualElement>
+</ui:UXML>

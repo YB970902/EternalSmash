@@ -1,43 +1,32 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Define;
-using UnityEngine;
 
-public class BTTwoTickSuccess : BTExecuteNodeBase
+public class BTTwoTickSuccess : BTExecuteAction
 {
     private int tickCount = 0;
-    
-    protected override void Init()
+
+    protected override void OnInit()
     {
         
     }
-    
+
     public override void OnEnter()
     {
-        base.OnEnter();
         tickCount = 0;
-        Debug.Log("OnEnter");
     }
 
     public override void OnExit()
     {
-        base.OnExit();
-        Debug.Log("OnExit");
+        
     }
 
-    public override void Evaluate()
+    public override BehaviourTree.BTState Evaluate()
     {
         tickCount++;
         if (tickCount >= 2)
         {
-            btCaller.OnChildEvaluated(BehaviourTree.BTState.Success);
-        }
-        else
-        {
-            btCaller.OnChildEvaluated(Define.BehaviourTree.BTState.Running);
+            return BehaviourTree.BTState.Success;
         }
         
-        Debug.Log($"NowMilliSeconds : [{DateTime.Now.Millisecond}]");
+        return Define.BehaviourTree.BTState.Running;
     }
 }
