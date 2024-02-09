@@ -115,6 +115,7 @@ namespace Editor.BT
         /// </summary>
         public void Load(string _name)
         {
+            ClearAllNode();
             AssetDatabase.Refresh();
             var data = StaticDataManager.Load<SDBehaviourEditorData>(_name);
             var orderedData = data.DataList.OrderBy(_ => _.NodeID).ToList();
@@ -138,6 +139,7 @@ namespace Editor.BT
         {
             foreach (var node in editorNodeList)
             {
+                node.DisconnectAllPorts();
                 RemoveElement(node);
             }
         }

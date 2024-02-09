@@ -215,7 +215,7 @@ namespace Editor.BT
         private void DisconnectInputPort()
         {
             // 입력포트와 연결된 간선을 모두 삭제한다.
-            if(inputPort.connected) treeView.DeleteElements(inputPort.connections);
+            if(inputPort != null && inputPort.connected) treeView.DeleteElements(inputPort.connections);
         }
 
         /// <summary>

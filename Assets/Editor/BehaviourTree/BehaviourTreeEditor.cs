@@ -41,12 +41,22 @@ public class BehaviourTreeEditor : EditorWindow
     private void OnClickSave()
     {
         var path = EditorUtility.SaveFilePanel("저장하기", "Assets/StaticData/SDBehaviourEditorData", "New BehaviourTree", "bytes");
+        
+        // 취소했을 경우 반환값이 Empty이므로, 반환한다.
+        if (path == string.Empty) return;
+        
         var fileName = path.Split("/").Last().Split(".").First();
         treeView.Save(fileName);
     }
 
     private void OnClickOpen()
     {
-        treeView.Load("NewData");
+        var path = EditorUtility.OpenFilePanel("불러오기", "Assets/StaticData/SDBehaviourEditorData", "bytes");
+        
+        // 취소했을 경우 반환값이 Empty이므로, 반환한다.
+        if (path == string.Empty) return;
+        
+        var fileName = path.Split("/").Last().Split(".").First();
+        treeView.Load(fileName);
     }
 }
