@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Editor.BT;
+using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -60,6 +61,7 @@ namespace Editor.Util
         public int GetConnectedNodeID(int _index)
         {
             if (_index < 0 || _index >= portList.Count) return Define.BehaviourTree.InvalidID;
+            Assert.IsTrue(portList[_index].Port.connected, "연결되지 않은 노드가 있습니다.");
             var edge = portList[_index].Port.connections.First();
             return (edge.input.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
         }

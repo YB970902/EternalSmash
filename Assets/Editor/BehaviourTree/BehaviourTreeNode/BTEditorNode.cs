@@ -8,6 +8,7 @@ using UnityEngine.UIElements;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Editor.BT
 {
@@ -179,6 +180,7 @@ namespace Editor.BT
         public int GetConnectedNodeID(Port _port)
         {
             if (_port == null) return Define.BehaviourTree.InvalidID;
+            Assert.IsTrue(_port.connected, "연결되지 않은 노드가 있습니다.");
             var edge = _port.connections.First();
             return (edge.input.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
         }
