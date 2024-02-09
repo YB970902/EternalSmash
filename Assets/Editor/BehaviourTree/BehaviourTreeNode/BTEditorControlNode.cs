@@ -43,7 +43,7 @@ namespace Editor.BT
             controlDropdown.choices.Add(Define.BehaviourTree.BTControlNodeType.While.ToString());
             controlDropdown.RegisterValueChangedCallback(OnChangeDropdown);
 
-            inputPort.Add(CreateInputPort());
+            MakeInputPort();
         }
 
         private void OnChangeDropdown(ChangeEvent<string> _evt)

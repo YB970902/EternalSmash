@@ -38,8 +38,9 @@ namespace Editor.BT
 
             dropdown.RegisterValueChangedCallback(OnDropdownChanged);
             
-            truePort = _node.CreateOutputPort();
-            falsePort = _node.CreateOutputPort();
+            truePort = _node.MakeOutputPort();
+            
+            falsePort = _node.MakeOutputPort();
             this.Q<VisualElement>("true-node").Add(truePort);
             this.Q<VisualElement>("false-node").Add(falsePort);
         }
@@ -65,8 +66,8 @@ namespace Editor.BT
         {
             var trueNode = _treeView.GetNodeByIndex(_data.TrueNodeID).Q<BTEditorNode>();
             var falseNode = _treeView.GetNodeByIndex(_data.FalseNodeID).Q<BTEditorNode>();
-            _treeView.Add(truePort.ConnectTo(trueNode.InputPort));
-            _treeView.Add(falsePort.ConnectTo(falseNode.InputPort));
+            _treeView.Add(truePort.ConnectTo(trueNode.InputPort()));
+            _treeView.Add(falsePort.ConnectTo(falseNode.InputPort()));
             
             var dropdown = this.Q<DropdownField>();
             dropdown.value = _data.ConditionalFuncType.ToString();

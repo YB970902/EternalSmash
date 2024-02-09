@@ -10,6 +10,10 @@ using StaticData;
 
 namespace Editor.BT
 {
+    /// <summary>
+    /// GraphView로 노드를 보여주는 스크립트.
+    /// 노드를 생성, 삭제하는 기능이 들어있다.
+    /// </summary>
     public class BehaviourTreeView : GraphView
     {
         public new class UxmlFactory : UxmlFactory<BehaviourTreeView, GraphView.UxmlTraits>
@@ -55,19 +59,24 @@ namespace Editor.BT
             var menuManipulator = new ContextualMenuManipulator(
                 _event =>
                 {
-                    _event.menu.AppendAction("AddRootNode", _actionEvent => AddElement(CreateNode(BehaviourTree.BTNodeType.Root, _actionEvent.eventInfo.localMousePosition)));
-                    _event.menu.AppendAction("AddControlNode", _actionEvent => AddElement(CreateNode(BehaviourTree.BTNodeType.Control, _actionEvent.eventInfo.localMousePosition)));
-                    _event.menu.AppendAction("AddExecuteNode", _actionEvent => AddElement(CreateNode(BehaviourTree.BTNodeType.Execute, _actionEvent.eventInfo.localMousePosition)));
+                    _event.menu.AppendAction("루트 노드 추가", _actionEvent => AddNode(BehaviourTree.BTNodeType.Root, _actionEvent.eventInfo.localMousePosition));
+                    _event.menu.AppendAction("컨트롤 노드 추가", _actionEvent => AddNode(BehaviourTree.BTNodeType.Control, _actionEvent.eventInfo.localMousePosition));
+                    _event.menu.AppendAction("행동 노드 추가", _actionEvent => AddNode(BehaviourTree.BTNodeType.Execute, _actionEvent.eventInfo.localMousePosition));
                 });
 
             return menuManipulator;
         }
 
-        private BTEditorNode CreateNode(Define.BehaviourTree.BTNodeType _nodeType, Vector2 _position)
+        private void AddNode(Define.BehaviourTree.BTNodeType _nodeType, Vector2 _position)
         {
-            _position.x = (_position.x - contentViewContainer.worldBound.x) / scale;
-            _position.y = (_position.y - contentViewContainer.worldBound.y) / scale;
+            _position.x = (_position.x - contentViewContainer.worldBound.xMin) / scale;
+            _position.y = (_position.y - contentViewContainer.worldBound.yMin) / scale;
 
+            CreateEditorNode(_nodeType, _position);
+        }
+
+        private BTEditorNode CreateEditorNode(BehaviourTree.BTNodeType _nodeType, Vector2 _position)
+        {
             var type = System.Type.GetType($"Editor.BT.BTEditor{_nodeType.ToString()}Node");
             var node = Activator.CreateInstance(type) as BTEditorNode;
             node.Init(_position, _nodeType, this);
@@ -75,20 +84,8 @@ namespace Editor.BT
             
             editorNodeList.Add(node);
             
-            return node;
-        }
-
-        private BTEditorNode CreateNode(SDBehaviourEditorData _sdData)
-        {
-            var type = System.Type.GetType($"Editor.BT.BTEditor{_sdData.Type.ToBtNodeType()}Node");
-            var node = Activator.CreateInstance(type) as BTEditorNode;
-            node.Init(new Vector2(_sdData.X, _sdData.Y), _sdData.Type.ToBtNodeType(), this);
-            node.Draw();
-            
-            editorNodeList.Add(node);
-            
             AddElement(node);
-            
+
             return node;
         }
 
@@ -97,6 +94,14 @@ namespace Editor.BT
             return editorNodeList[_index];
         }
 
+        /// <summary>
+        /// 현재 노드 정보를 비우고 새로 만든다.
+        /// </summary>
+        public void New()
+        {
+            ClearAllNode();
+        }
+        
         /// <summary>
         /// 노드 정보를 저장한다.
         /// </summary>
@@ -117,12 +122,23 @@ namespace Editor.BT
             
             foreach (var sdData in orderedData)
             {
-                editorNodes.Add(CreateNode(sdData));
+                editorNodes.Add(CreateEditorNode(sdData.Type.ToBtNodeType(), new Vector2(sdData.X, sdData.Y)));
             }
 
             for (int i = 0, count = editorNodes.Count; i < count; ++i)
             {
                 editorNodes[i].SetSdData(orderedData[i]);
+            }
+        }
+
+        /// <summary>
+        /// 모든 노드를 삭제한다.
+        /// </summary>
+        private void ClearAllNode()
+        {
+            foreach (var node in editorNodeList)
+            {
+                RemoveElement(node);
             }
         }
         

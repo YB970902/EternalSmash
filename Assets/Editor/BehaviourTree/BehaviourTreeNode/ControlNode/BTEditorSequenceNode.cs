@@ -48,7 +48,7 @@ namespace Editor.BT
             {
                 multiPortController.OnClickAddButton(null);
                 var childNode = _treeView.GetNodeByIndex(childID).Q<BTEditorNode>();
-                _treeView.Add(multiPortController.Port(index++).ConnectTo(childNode.InputPort));
+                _treeView.Add(multiPortController.Port(index++).ConnectTo(childNode.InputPort()));
             }
         }
     }

@@ -37,7 +37,7 @@ namespace Editor.Util
         public void OnClickAddButton(ClickEvent _evt)
         {
             var port = new MultiPort();
-            port.Init(this, node.CreateOutputPort());
+            port.Init(this, node.MakeOutputPort());
             portList.Add(port);
             container.Insert(container.childCount - 1, port);
         }

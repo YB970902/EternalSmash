@@ -19,23 +19,35 @@ namespace Editor.BT
         protected string nodeTypeName;
 
         private VisualElement nodeMain;
-        protected VisualElement inputPort { get; private set; }
-        protected VisualElement outputPort { get; private set; }
+        /// <summary> 입력 포트가 들어갈 요소 </summary>
+        private VisualElement inputPortElement;
+        /// <summary> 출력 포트가 들어갈 요소 </summary>
+        private VisualElement outputPortElement;
         protected VisualElement extension { get; private set; }
 
         protected Label nodeNameLabel { get; private set; }
 
+        /// <summary> 입력 포트 정보 </summary>
+        private Port inputPort;
+
         protected BehaviourTreeView treeView;
 
-        private List<Port> inputPorts = new List<Port>();
-        private List<Port> outputPorts = new List<Port>();
+        /// <summary> 출력 포트 정보 </summary>
+        private List<Port> outputPorts;
 
-        public Port InputPort => inputPorts[0];
+        public Port InputPort() => inputPort;
         public Port OutputPort(int _index) => outputPorts[_index];
 
         public System.Action<Port> onPortRemoved;
 
+        /// <summary>
+        /// 경고 알람을 띄우는 중인지 여부
+        /// </summary>
         private bool isWarning;
+        /// <summary>
+        /// 경고 알람을 띄운다.
+        /// 노드의 색상을 바꾼다.
+        /// </summary>
         public bool IsWarning
         {
             get { return isWarning; }
@@ -58,11 +70,13 @@ namespace Editor.BT
         public BTEditorNode() : base("Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorNode.uxml")
         {
             nodeMain = this.Q<VisualElement>("node-main");
-            inputPort = this.Q<VisualElement>("input-port");
-            outputPort = this.Q<VisualElement>("output-port");
+            inputPortElement = this.Q<VisualElement>("input-port");
+            outputPortElement = this.Q<VisualElement>("output-port");
             extension = this.Q<VisualElement>("extension-content");
             nodeNameLabel = this.Q<Label>("node-name");
             isWarning = false;
+
+            outputPorts = new List<Port>();
         }
         
         public void Init(Vector2 _position, Define.BehaviourTree.BTNodeType _nodeType, BehaviourTreeView _treeView)
@@ -77,7 +91,7 @@ namespace Editor.BT
         {
             nodeNameLabel.text = _data.NickName;
         }
-        
+
         public void Draw()
         {
             nodeNameLabel.text = nodeTypeName;
@@ -85,27 +99,32 @@ namespace Editor.BT
             OnDraw();
         }
 
-        protected Port CreateInputPort()
+        private Port CreatePort(Direction _direction)
         {
-            var port = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
+            var port = InstantiatePort(Orientation.Vertical, _direction, Port.Capacity.Single, typeof(bool));
             port.portName = string.Empty;
-            port.Q<Label>("type").style.marginLeft = 0;
-            port.Q<Label>("type").style.marginRight = 0;
-            
-            inputPorts.Add(port);
-            
+            var label = port.Q<Label>("type");
+            label.style.marginLeft = 0;
+            label.style.marginRight = 0;
+
             return port;
         }
         
-        public Port CreateOutputPort()
+        protected void MakeInputPort()
         {
-            var port = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
-            port.portName = string.Empty;
-            port.Q<Label>("type").style.marginLeft = 0;
-            port.Q<Label>("type").style.marginRight = 0;
+            var port = CreatePort(Direction.Input);
+            
+            inputPort = port;
+            inputPortElement.Add(port);
+        }
+        
+        public Port MakeOutputPort()
+        {
+            var port = CreatePort(Direction.Output);
             
             outputPorts.Add(port);
-            
+            outputPortElement.Add(port);
+
             return port;
         }
 
@@ -133,8 +152,8 @@ namespace Editor.BT
         
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            evt.menu.AppendAction("Disconnect Input Ports", actionEvent => DisconnectInputPorts());
-            evt.menu.AppendAction("Disconnect Output Ports", actionEvent => DisconnectOutputPorts());
+            evt.menu.AppendAction("입력 포트 연결 해제", actionEvent => DisconnectInputPort());
+            evt.menu.AppendAction("출력 포트 연결 해제", actionEvent => DisconnectOutputPorts());
 
             base.BuildContextualMenu(evt);
         }
@@ -146,7 +165,7 @@ namespace Editor.BT
 
         public int GetParentNodeID()
         {
-            var edge = inputPorts[0].connections.First();
+            var edge = inputPort.connections.First();
             return (edge.output.node as BTEditorNode)?.GetNodeID() ?? Define.BehaviourTree.InvalidID;
         }
 
@@ -181,24 +200,28 @@ namespace Editor.BT
 
         public void DisconnectAllPorts()
         {
-            DisconnectInputPorts();
+            DisconnectInputPort();
             DisconnectOutputPorts();
         }
 
-        private void DisconnectInputPorts()
+        /// <summary>
+        /// 입력포트가 삭제된경우
+        /// </summary>
+        private void DisconnectInputPort()
         {
-            for (int i = 0, count = inputPorts.Count; i < count; ++i)
-            {
-                if (inputPorts[i].connected == false) continue;
-                treeView.DeleteElements(inputPorts[i].connections);
-            }
+            // 입력포트와 연결된 간선을 모두 삭제한다.
+            if(inputPort.connected) treeView.DeleteElements(inputPort.connections);
         }
 
+        /// <summary>
+        /// 출력 포트가 삭제된경우
+        /// </summary>
         private void DisconnectOutputPorts()
         {
             for (int i = 0, count = outputPorts.Count; i < count; ++i)
             {
                 if (outputPorts[i].connected == false) continue;
+                // 연결된 모든 간선을 삭제한다.
                 treeView.DeleteElements(outputPorts[i].connections);
             }
         }

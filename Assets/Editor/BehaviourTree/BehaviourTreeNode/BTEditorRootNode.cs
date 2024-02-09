@@ -19,12 +19,12 @@ namespace Editor.BT
             
             var port = OutputPort(0);
             var targetNode = treeView.GetNodeByIndex(_data.ChildID).Q<BTEditorNode>();
-            treeView.Add(port.ConnectTo(targetNode.InputPort));
+            treeView.Add(port.ConnectTo(targetNode.InputPort()));
         }
 
         protected override void OnDraw()
         {
-            outputPort.Add(CreateOutputPort());
+            MakeOutputPort();
         }
 
         public override SDBehaviourEditorData CreateSDBehaviourTreeData()

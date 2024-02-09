@@ -22,7 +22,7 @@ namespace Editor.BT
             IsWarning = true;
             
             LoadVisualElement("Assets/Editor/BehaviourTree/BehaviourTreeNode/BTEditorExecuteNode.uxml");
-            inputPort.Add(CreateInputPort());
+            MakeInputPort();
 
             var dropdown = this.Q<DropdownField>();
             dropdown.choices = new List<string>();

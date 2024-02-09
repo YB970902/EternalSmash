@@ -31,7 +31,7 @@ namespace Editor.BT
             repeatCount = 0;
 
             var portContainer = this.Q<VisualElement>("port-container");
-            portContainer.Add(_node.CreateOutputPort());
+            portContainer.Add(_node.MakeOutputPort());
         }
 
         private void OnValueChange(ChangeEvent<int> _evt)
@@ -51,7 +51,7 @@ namespace Editor.BT
         public void SetConnectData(SDBehaviourEditorData _data, BehaviourTreeView _treeView)
         {
             var childNode = _treeView.GetNodeByIndex(_data.ChildID).Q<BTEditorNode>();
-            _treeView.Add(node.OutputPort(0).ConnectTo(childNode.InputPort));
+            _treeView.Add(node.OutputPort(0).ConnectTo(childNode.InputPort()));
             
             var repeatCountField = this.Q<IntegerField>();
             repeatCountField.value = _data.RepeatCount;
