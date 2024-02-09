@@ -6,7 +6,6 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -27,6 +26,9 @@ namespace Editor.BT
         protected VisualElement extension { get; private set; }
 
         protected Label nodeNameLabel { get; private set; }
+        
+        /// <summary> 노드 별명 </summary>
+        protected TextField nodeNickNameField { get; private set; }
 
         /// <summary> 입력 포트 정보 </summary>
         private Port inputPort;
@@ -75,6 +77,7 @@ namespace Editor.BT
             outputPortElement = this.Q<VisualElement>("output-port");
             extension = this.Q<VisualElement>("extension-content");
             nodeNameLabel = this.Q<Label>("node-name");
+            nodeNickNameField = this.Q<TextField>("node-nickname");
             isWarning = false;
 
             outputPorts = new List<Port>();
@@ -90,7 +93,7 @@ namespace Editor.BT
 
         public virtual void SetSdData(SDBehaviourEditorData _data)
         {
-            nodeNameLabel.text = _data.NickName;
+            nodeNickNameField.value = _data.NickName;
         }
 
         public void Draw()
@@ -191,7 +194,7 @@ namespace Editor.BT
         public virtual SDBehaviourEditorData CreateSDBehaviourTreeData()
         {
             var result = new SDBehaviourEditorData();
-            result.NickName = nodeNameLabel.text;
+            result.NickName = nodeNickNameField.text;
             var position = GetPosition().position;
             result.X = position.x;
             result.Y = position.y;
