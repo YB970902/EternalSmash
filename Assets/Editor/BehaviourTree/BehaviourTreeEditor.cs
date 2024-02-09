@@ -1,9 +1,13 @@
+using System.Linq;
 using Editor.BT;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
+/// <summary>
+/// 행동트리 에디터의 메인
+/// BehaviourTreeView를 띄운다.
+/// </summary>
 public class BehaviourTreeEditor : EditorWindow
 {
     [SerializeField] private VisualTreeAsset behaviourTreeUxml;
@@ -31,16 +35,18 @@ public class BehaviourTreeEditor : EditorWindow
 
     private void OnClickNew()
     {
-        treeView.Load("");
+        treeView.New();
     }
     
     private void OnClickSave()
     {
-        treeView.Save("default");
+        var path = EditorUtility.SaveFilePanel("저장하기", "Assets/StaticData/SDBehaviourEditorData", "New BehaviourTree", "bytes");
+        var fileName = path.Split("/").Last().Split(".").First();
+        treeView.Save(fileName);
     }
 
     private void OnClickOpen()
     {
-        treeView.Load("default");
+        treeView.Load("NewData");
     }
 }
