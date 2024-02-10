@@ -118,11 +118,13 @@ namespace Editor.BT
             ClearAllNode();
             AssetDatabase.Refresh();
             var data = StaticDataManager.Load<SDBehaviourEditorData>(_name);
+            // 노드 ID 순서대로 정렬한 데이터
             var orderedData = data.DataList.OrderBy(_ => _.NodeID).ToList();
             var editorNodes = new List<BTEditorNode>(orderedData.Count);
             
             foreach (var sdData in orderedData)
             {
+                // 노드ID 순서대로 노드를 생성한다.
                 editorNodes.Add(CreateEditorNode(sdData.Type.ToBtNodeType(), new Vector2(sdData.X, sdData.Y)));
             }
 
@@ -142,6 +144,7 @@ namespace Editor.BT
                 node.DisconnectAllPorts();
                 RemoveElement(node);
             }
+            editorNodeList.Clear();
         }
         
         #region Callbacks

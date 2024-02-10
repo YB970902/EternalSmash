@@ -91,6 +91,10 @@ namespace Editor.BT
             SetPosition(new Rect(_position, Vector2.zero));
         }
 
+        /// <summary>
+        /// StaticData의 정보를 보고 데이터를 세팅한다.
+        /// 부모 노드와 연결하거나 자식 노드와 연결하는 등의 내용이 들어있다.
+        /// </summary>
         public virtual void SetSdData(SDBehaviourEditorData _data)
         {
             nodeNickNameField.value = _data.NickName;
