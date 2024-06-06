@@ -12,7 +12,7 @@ namespace Battle
 
         public TileModule Tile => tileModule;
         
-        public override void Init()
+        protected override void Init()
         {
             tileModule = new TileModule();
         }
